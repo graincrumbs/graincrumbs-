@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { KeyRound, Loader2, LogOut, Search } from "lucide-react";
+import { KeyRound, Loader2, LogOut, MessageCircle, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/")({
@@ -38,6 +38,20 @@ const STATUS_STYLES: Record<Order["status"], string> = {
   completed: "bg-green-100 text-green-900 border-green-300",
   cancelled: "bg-red-100 text-red-900 border-red-300",
 };
+
+// ── NEW: build a wa.me URL from any phone string ──────────────────────────────
+// Strips all non-digits, then ensures the number starts with the country code.
+// Handles formats like: "+91 98765 43210", "098765 43210", "9876543210"
+function toWhatsAppUrl(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  // If it's already 12 digits and starts with 91, use as-is; otherwise prepend 91
+  const normalised =
+    digits.length === 12 && digits.startsWith("91")
+      ? digits
+      : `91${digits.slice(-10)}`;
+  return `https://wa.me/${normalised}`;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Detect assorted box orders from the flavour field
 function isAssortedBoxOrder(flavour: string | null): boolean {
@@ -194,7 +208,7 @@ function AdminDashboard() {
                 <tr>
                   <th className="px-4 py-3 text-left">Order #</th>
                   <th className="px-4 py-3 text-left">Customer</th>
-                  <th className="px-4 py-3 text-left">Mobile</th>
+                  <th className="px-4 py-3 text-left">WhatsApp</th>
                   <th className="px-4 py-3 text-left">Product</th>
                   <th className="px-4 py-3 text-left">Flavour / Type</th>
                   <th className="px-4 py-3 text-left">Qty</th>
@@ -216,7 +230,19 @@ function AdminDashboard() {
                   >
                     <td className="px-4 py-3 font-mono text-sm font-semibold text-[color:var(--chocolate-dark)]">#{o.order_number}</td>
                     <td className="px-4 py-3 font-medium">{o.name}</td>
-                    <td className="px-4 py-3">{o.phone}</td>
+                    {/* ── CHANGED: phone is now a tappable WhatsApp link ── */}
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <a
+                        href={toWhatsAppUrl(o.phone)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-3 py-1 text-xs font-medium text-[color:var(--chocolate-dark)] hover:bg-[color:var(--gold)]/20 transition-colors"
+                        title={`WhatsApp ${o.phone}`}
+                      >
+                        <MessageCircle className="h-3 w-3 text-[color:var(--gold)]" />
+                        {o.phone}
+                      </a>
+                    </td>
                     <td className="px-4 py-3">{o.product_type}</td>
                     <td className="px-4 py-3">
                       {isAssortedBoxOrder(o.flavour) ? (
@@ -249,7 +275,20 @@ function AdminDashboard() {
               <div>
                 <p className="eyebrow">Enquiry</p>
                 <h2 className="mt-2 font-display text-3xl">{active.name}</h2>
-                <p className="text-sm text-muted-foreground">{active.phone}{active.email && ` · ${active.email}`}</p>
+                {/* ── CHANGED: phone in modal header is also a WhatsApp link ── */}
+                <p className="text-sm text-muted-foreground">
+                  <a
+                    href={toWhatsAppUrl(active.phone)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[color:var(--chocolate-dark)] underline underline-offset-2 decoration-[color:var(--gold)] hover:opacity-75 transition-opacity"
+                    title="Open WhatsApp chat"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5 text-[color:var(--gold)]" />
+                    {active.phone}
+                  </a>
+                  {active.email && <span className="ml-1">· {active.email}</span>}
+                </p>
                 {active.order_number && (
                   <p className="mt-1 inline-block rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/50 px-3 py-1 font-mono text-sm font-semibold text-[color:var(--chocolate-dark)]">
                     #{active.order_number}
@@ -316,7 +355,20 @@ function AdminDashboard() {
               </div>
             )}
 
-            <div className="mt-8 border-t border-border pt-6">
+            {/* ── NEW: quick WhatsApp button in modal footer ── */}
+            <div className="mt-6 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">Contact Customer</p>
+              <a
+                href={toWhatsAppUrl(active.phone)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-[color:var(--gold)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--chocolate-dark)] hover:opacity-90 transition-opacity"
+              >
+                <MessageCircle className="h-4 w-4" /> WhatsApp {active.name.split(" ")[0]}
+              </a>
+            </div>
+
+            <div className="mt-6 border-t border-border pt-6">
               <p className="eyebrow mb-3">Update status</p>
               <div className="flex flex-wrap gap-2">
                 {STATUSES.map((s) => (

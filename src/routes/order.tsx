@@ -363,8 +363,21 @@ function OrderPage() {
                 <Field label="Full Name" required>
                   <input required value={form.name} onChange={(e) => update("name", e.target.value)} className={inputCls} placeholder="Your name" />
                 </Field>
-                <Field label="Mobile Number" required>
-                  <input required type="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} className={inputCls} placeholder="+91 9XXXX XXXXX" />
+                {/* ── CHANGED: label updated + WhatsApp hint added below the input ── */}
+                <Field label="WhatsApp Number" required>
+                  <input
+                    required
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => update("phone", e.target.value)}
+                    className={inputCls}
+                    placeholder="+91 9XXXX XXXXX"
+                  />
+                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <MessageCircle className="h-3 w-3 shrink-0 text-[color:var(--gold)]" />
+                    Please enter your WhatsApp number — we'll use this to confirm your order.
+                    If your WhatsApp number is different from your regular number, use that one here.
+                  </p>
                 </Field>
                 <Field label="Email" required>
                   <input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className={inputCls} placeholder="you@example.com" />
@@ -409,7 +422,6 @@ function OrderPage() {
                       >
                         {flavoursList.map((f) => <option key={f}>{f}</option>)}
                         <option disabled>──────────</option>
-                        {/* CHANGE 1: Label updated to "Premium Assorted Box" in dropdown */}
                         <option value={ASSORTED_BOX}>Premium Assorted Box</option>
                       </select>
                     </Field>
@@ -418,14 +430,13 @@ function OrderPage() {
                     {isAssortedBox && (
                       <div className="sm:col-span-2 flex items-start gap-2 rounded-xl border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/50 px-4 py-3 text-sm">
                         <span className="mt-0.5 shrink-0 font-semibold text-[color:var(--gold)]">*</span>
-                        {/* CHANGE 2: Added "Includes artisanal toppings and decorations." to the note */}
                         <p className="text-muted-foreground">
                           This box will have <span className="font-medium text-foreground">all 6 flavours</span> — 6 pieces per box (one of each flavour). Includes artisanal toppings and decorations. Select how many boxes you'd like below.
                         </p>
                       </div>
                     )}
 
-                    {/* CHANGE 3: Pricing card — shown above the quantity selector when Assorted Box is selected */}
+                    {/* Pricing card — shown above the quantity selector when Assorted Box is selected */}
                     {isAssortedBox && (
                       <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
                         <div className="flex items-end justify-between flex-wrap gap-2">
