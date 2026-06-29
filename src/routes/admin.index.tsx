@@ -62,7 +62,7 @@ function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return "—";
   const d = new Date(dateStr);
   const day = String(d.getUTCDate()).padStart(2, "0");
-  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const month = d.toLocaleString("en-GB", { month: "short", timeZone: "UTC" });
   return `${day}/${month}/${d.getUTCFullYear()}`;
 }
 
