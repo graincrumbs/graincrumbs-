@@ -38,9 +38,17 @@ const flavoursList = [
 const ASSORTED_BOX = "Assorted Box";
 const flavoursWithAssorted = [...flavoursList, ASSORTED_BOX];
 
+const ASSORTED_BOX_PRICE = 789;
+
 const browniePieces = ["6 pieces", "12 pieces", "18 pieces", "24 pieces"];
 // For assorted box — quantity means number of boxes (each box = 6 pieces, all 6 flavours)
 const assortedBoxQty = ["1 box", "2 boxes", "3 boxes", "4 boxes", "5 boxes", "6+ boxes"];
+
+// Helper to parse number of boxes from assortedQty string
+function parseBoxCount(qty: string): number | null {
+  const match = qty.match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
 
 const cakeWeights = ["250g", "500g", "650g", "1kg"];
 
@@ -95,6 +103,12 @@ function OrderPage() {
 
   const isAssortedBox = form.flavour === ASSORTED_BOX;
 
+  // Compute assorted box total price
+  const assortedBoxCount = isAssortedBox ? parseBoxCount(form.assortedQty) : null;
+  const assortedBoxTotal = assortedBoxCount !== null
+    ? assortedBoxCount * ASSORTED_BOX_PRICE
+    : null;
+
   const estimate = estimateDelivery(form.pincode);
 
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
@@ -137,8 +151,9 @@ function OrderPage() {
       hasCart && form.type === "Brownies" && `Estimated total: ₹${cartSubtotal}`,
       !hasCart && form.type === "Brownies" && !isAssortedBox && `Flavour: ${form.flavour}`,
       !hasCart && form.type === "Brownies" && !isAssortedBox && `Pieces: ${form.browniePieces}`,
-      !hasCart && form.type === "Brownies" && isAssortedBox && `Selection: Assorted Box (all 6 flavours, 6 pieces per box)`,
+      !hasCart && form.type === "Brownies" && isAssortedBox && `Selection: Premium Assorted Box (all 6 flavours, 6 pieces per box)`,
       !hasCart && form.type === "Brownies" && isAssortedBox && `Number of Boxes: ${form.assortedQty}`,
+      !hasCart && form.type === "Brownies" && isAssortedBox && assortedBoxTotal !== null && `Estimated Total: ₹${assortedBoxTotal}`,
       form.type === "Brownie Cake" && `Flavour: ${form.flavour}`,
       form.type === "Brownie Cake" && `Weight: ${form.weight}`,
       form.type === "Brownie Cake" && form.message && `Cake message: ${form.message}`,
@@ -159,7 +174,7 @@ function OrderPage() {
       form.notes && `Notes: ${form.notes}`,
     ].filter(Boolean).join("\n");
     return encodeURIComponent(lines);
-  }, [form, hasCart, cartSummary, cartSubtotal, isAssortedBox]);
+  }, [form, hasCart, cartSummary, cartSubtotal, isAssortedBox, assortedBoxTotal]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +215,7 @@ function OrderPage() {
         ? hasCart && form.type === "Brownies"
           ? cartItems.map((i) => i.name).join(", ")
           : isAssortedBox
-            ? "Assorted Box (all 6 flavours, 6 pieces per box)"
+            ? "Premium Assorted Box (all 6 flavours, 6 pieces per box)"
             : form.flavour
         : null;
 
@@ -385,7 +400,7 @@ function OrderPage() {
                 {/* BROWNIES — manual / no cart flow */}
                 {isBrownies && !hasCart && (
                   <>
-                    {/* Flavour dropdown includes Assorted Box at the bottom */}
+                    {/* Flavour dropdown includes Premium Assorted Box at the bottom */}
                     <Field label="Flavour" full>
                       <select
                         value={form.flavour}
@@ -394,7 +409,8 @@ function OrderPage() {
                       >
                         {flavoursList.map((f) => <option key={f}>{f}</option>)}
                         <option disabled>──────────</option>
-                        <option value={ASSORTED_BOX}>Assorted Box</option>
+                        {/* CHANGE 1: Label updated to "Premium Assorted Box" in dropdown */}
+                        <option value={ASSORTED_BOX}>Premium Assorted Box</option>
                       </select>
                     </Field>
 
@@ -402,8 +418,36 @@ function OrderPage() {
                     {isAssortedBox && (
                       <div className="sm:col-span-2 flex items-start gap-2 rounded-xl border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/50 px-4 py-3 text-sm">
                         <span className="mt-0.5 shrink-0 font-semibold text-[color:var(--gold)]">*</span>
+                        {/* CHANGE 2: Added "Includes artisanal toppings and decorations." to the note */}
                         <p className="text-muted-foreground">
-                          This box will have <span className="font-medium text-foreground">all 6 flavours</span> — 6 pieces per box (one of each flavour). Select how many boxes you'd like below.
+                          This box will have <span className="font-medium text-foreground">all 6 flavours</span> — 6 pieces per box (one of each flavour). Includes artisanal toppings and decorations. Select how many boxes you'd like below.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* CHANGE 3: Pricing card — shown above the quantity selector when Assorted Box is selected */}
+                    {isAssortedBox && (
+                      <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
+                        <div className="flex items-end justify-between flex-wrap gap-2">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Price per Box</p>
+                            <p className="mt-1 font-display text-3xl text-[color:var(--chocolate-dark)]">
+                              ₹{ASSORTED_BOX_PRICE}
+                            </p>
+                          </div>
+                          {assortedBoxTotal !== null && (
+                            <div className="text-right">
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                                {form.assortedQty} × ₹{ASSORTED_BOX_PRICE}
+                              </p>
+                              <p className="mt-1 font-display text-3xl text-[color:var(--chocolate)]">
+                                ₹{assortedBoxTotal}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        <p className="mt-2 text-[11px] text-muted-foreground">
+                          * Estimated total. Final price confirmed on order review.
                         </p>
                       </div>
                     )}
