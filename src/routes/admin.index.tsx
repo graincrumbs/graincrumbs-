@@ -167,6 +167,8 @@ function AdminDashboard() {
             <p className="mt-2 text-sm text-muted-foreground">{filtered.length} of {orders.length} enquiries</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link to="/admin/products" className="btn-outline">Brownies</Link>
+            <Link to="/admin/cake-flavours" className="btn-outline">Cakes</Link>
             <Link to="/admin/change-password" className="btn-outline">
               <KeyRound className="h-4 w-4" /> Change Password
             </Link>

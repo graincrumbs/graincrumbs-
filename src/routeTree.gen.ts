@@ -22,9 +22,11 @@ import { Route as BrownieCakesRouteImport } from './routes/brownie-cakes'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminForgotPasswordRouteImport } from './routes/admin.forgot-password'
 import { Route as AdminChangePasswordRouteImport } from './routes/admin.change-password'
+import { Route as AdminCakeFlavoursRouteImport } from './routes/admin.cake-flavours'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -91,6 +93,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/admin/products',
+  path: '/admin/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -104,6 +111,11 @@ const AdminForgotPasswordRoute = AdminForgotPasswordRouteImport.update({
 const AdminChangePasswordRoute = AdminChangePasswordRouteImport.update({
   id: '/admin/change-password',
   path: '/admin/change-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCakeFlavoursRoute = AdminCakeFlavoursRouteImport.update({
+  id: '/admin/cake-flavours',
+  path: '/admin/cake-flavours',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -120,9 +132,11 @@ export interface FileRoutesByFullPath {
   '/grain-crumbs-pro': typeof GrainCrumbsProRoute
   '/order': typeof OrderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -138,9 +152,11 @@ export interface FileRoutesByTo {
   '/grain-crumbs-pro': typeof GrainCrumbsProRoute
   '/order': typeof OrderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -157,9 +173,11 @@ export interface FileRoutesById {
   '/grain-crumbs-pro': typeof GrainCrumbsProRoute
   '/order': typeof OrderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -177,9 +195,11 @@ export interface FileRouteTypes {
     | '/grain-crumbs-pro'
     | '/order'
     | '/sitemap.xml'
+    | '/admin/cake-flavours'
     | '/admin/change-password'
     | '/admin/forgot-password'
     | '/admin/login'
+    | '/admin/products'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -195,9 +215,11 @@ export interface FileRouteTypes {
     | '/grain-crumbs-pro'
     | '/order'
     | '/sitemap.xml'
+    | '/admin/cake-flavours'
     | '/admin/change-password'
     | '/admin/forgot-password'
     | '/admin/login'
+    | '/admin/products'
     | '/admin'
   id:
     | '__root__'
@@ -213,9 +235,11 @@ export interface FileRouteTypes {
     | '/grain-crumbs-pro'
     | '/order'
     | '/sitemap.xml'
+    | '/admin/cake-flavours'
     | '/admin/change-password'
     | '/admin/forgot-password'
     | '/admin/login'
+    | '/admin/products'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -232,9 +256,11 @@ export interface RootRouteChildren {
   GrainCrumbsProRoute: typeof GrainCrumbsProRoute
   OrderRoute: typeof OrderRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminCakeFlavoursRoute: typeof AdminCakeFlavoursRoute
   AdminChangePasswordRoute: typeof AdminChangePasswordRoute
   AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminProductsRoute: typeof AdminProductsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -331,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/admin/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -352,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminChangePasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/cake-flavours': {
+      id: '/admin/cake-flavours'
+      path: '/admin/cake-flavours'
+      fullPath: '/admin/cake-flavours'
+      preLoaderRoute: typeof AdminCakeFlavoursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -368,9 +408,11 @@ const rootRouteChildren: RootRouteChildren = {
   GrainCrumbsProRoute: GrainCrumbsProRoute,
   OrderRoute: OrderRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminCakeFlavoursRoute: AdminCakeFlavoursRoute,
   AdminChangePasswordRoute: AdminChangePasswordRoute,
   AdminForgotPasswordRoute: AdminForgotPasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminProductsRoute: AdminProductsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport

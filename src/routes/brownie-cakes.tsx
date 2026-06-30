@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Reveal } from "@/components/Reveal";
 import { WHATSAPP_ORDER_URL } from "@/lib/whatsapp";
+import { useCakeFlavours } from "@/lib/use-cake-flavours";
 
 export const Route = createFileRoute("/brownie-cakes")({
   head: () => ({
@@ -24,22 +25,6 @@ export const Route = createFileRoute("/brownie-cakes")({
 const photo =
   "h-full w-full object-cover saturate-[0.92] contrast-[1.05] brightness-[0.98]";
 
-type Row = {
-  name: string;
-  icon: string;
-  prices: [number, number, number, number]; // 250, 500, 650, 1000
-  old: [number, number, number, number];
-};
-
-const rows: Row[] = [
-  { name: "Chocolate Walnut",         icon: "/assets/grain-crumbs/chocolate-walnut.png",  old: [360, 640, 810, 1200],  prices: [310, 540, 670, 990]   },
-  { name: "Cappuccino Walnut",        icon: "/assets/grain-crumbs/cappuccino-walnut.png", old: [360, 620, 780, 1150],  prices: [310, 520, 650, 950]   },
-  { name: "Mixed Berry Jam",          icon: "/assets/grain-crumbs/mixed-berry-jam.png",   old: [270, 460, 570, 840],   prices: [230, 390, 480, 700]   },
-  { name: "Coconut Bounty",           icon: "/assets/grain-crumbs/coconut-bounty.png",    old: [280, 490, 610, 900],   prices: [240, 410, 510, 740]   },
-  { name: "Cream Cheese",             icon: "/assets/grain-crumbs/cream-cheese.png",      old: [380, 690, 870, 1300],  prices: [320, 570, 720, 1060]  },
-  { name: "Hazelnut Spread Filling",  icon: "/assets/grain-crumbs/hazelnut-spread.png",   old: [460, 850, 1080, 1620], prices: [390, 700, 890, 1320]  },
-];
-
 const occasions = [
   { title: "Birthdays",       tag: "Walnut & chocolate, hand-piped.",     img: "/assets/grain-crumbs/occasions/birthday.png"        },
   { title: "For Mom",         tag: "Personalised, heart-detailed.",        img: "/assets/grain-crumbs/occasions/for-mom.png"          },
@@ -56,6 +41,7 @@ const heroImages = [
 ];
 
 function Page() {
+  const { flavours: rows } = useCakeFlavours();
   return (
     <>
       {/* ── HERO ── */}
@@ -115,29 +101,33 @@ function Page() {
               <div className="text-center">1000g</div>
             </div>
 
-            {rows.map((r, i) => (
+            {rows.map((r, i) => {
+              const prices = [r.price_250, r.price_500, r.price_650, r.price_1000];
+              const olds = [r.old_price_250, r.old_price_500, r.old_price_650, r.old_price_1000];
+              return (
               <div
-                key={r.name}
+                key={r.id}
                 className={`grid grid-cols-[1.6fr_repeat(4,1fr)] items-center px-8 py-5 ${
                   i !== rows.length - 1 ? "border-t border-border/60" : ""
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-[color:var(--gold)]/30">
-                    <img src={r.icon} alt={r.name} className="h-full w-full object-cover" loading="lazy" />
+                    <img src={r.image_url ?? ""} alt={r.name} className="h-full w-full object-cover" loading="lazy" />
                   </div>
                   <div className="font-display text-lg leading-tight text-[color:var(--chocolate-dark)]">
                     {r.name}
                   </div>
                 </div>
-                {r.prices.map((p, idx) => (
+                {prices.map((p, idx) => (
                   <div key={idx} className="text-center">
-                    <div className="text-[11px] text-muted-foreground line-through">₹{r.old[idx]}</div>
+                    <div className="text-[11px] text-muted-foreground line-through">₹{olds[idx]}</div>
                     <div className="font-display text-xl text-[color:var(--chocolate)]">₹{p}</div>
                   </div>
                 ))}
               </div>
-            ))}
+              );
+            })}
           </Reveal>
 
           {/* ── MOBILE CARDS (< md) ── */}
@@ -152,9 +142,12 @@ function Page() {
             </div>
 
             <div className="space-y-3">
-              {rows.map((r) => (
+              {rows.map((r) => {
+                const prices = [r.price_250, r.price_500, r.price_650, r.price_1000];
+                const olds = [r.old_price_250, r.old_price_500, r.old_price_650, r.old_price_1000];
+                return (
                 <div
-                  key={r.name}
+                  key={r.id}
                   className="overflow-hidden rounded-2xl border border-[color:var(--gold)]/30 bg-card shadow-[0_8px_24px_-12px_rgba(60,30,10,0.25)]"
                 >
                   {/* Single row: icon + name + 4 prices */}
@@ -162,7 +155,7 @@ function Page() {
                     {/* Flavour name + icon */}
                     <div className="flex items-center gap-2 pr-2">
                       <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-[color:var(--gold)]/30">
-                        <img src={r.icon} alt={r.name} className="h-full w-full object-cover" loading="lazy" />
+                        <img src={r.image_url ?? ""} alt={r.name} className="h-full w-full object-cover" loading="lazy" />
                       </div>
                       <span className="font-display text-[13px] leading-snug text-[color:var(--chocolate-dark)]">
                         {r.name}
@@ -170,10 +163,10 @@ function Page() {
                     </div>
 
                     {/* 4 price columns */}
-                    {r.prices.map((p, idx) => (
+                    {prices.map((p, idx) => (
                       <div key={idx} className="flex flex-col items-center gap-0.5 border-l border-border/40 py-1">
                         <span className="text-[9px] leading-none text-muted-foreground line-through">
-                          ₹{r.old[idx]}
+                          ₹{olds[idx]}
                         </span>
                         <span className="font-display text-[13px] leading-tight text-[color:var(--chocolate)]">
                           ₹{p}
@@ -182,7 +175,8 @@ function Page() {
                     ))}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </Reveal>
 

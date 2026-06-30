@@ -14,6 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      cake_flavours: {
+        Row: {
+          id: string
+          name: string
+          image_url: string | null
+          price_250: number
+          old_price_250: number
+          price_500: number
+          old_price_500: number
+          price_650: number
+          old_price_650: number
+          price_1000: number
+          old_price_1000: number
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          image_url?: string | null
+          price_250?: number
+          old_price_250?: number
+          price_500?: number
+          old_price_500?: number
+          price_650?: number
+          old_price_650?: number
+          price_1000?: number
+          old_price_1000?: number
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          image_url?: string | null
+          price_250?: number
+          old_price_250?: number
+          price_500?: number
+          old_price_500?: number
+          price_650?: number
+          old_price_650?: number
+          price_1000?: number
+          old_price_1000?: number
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          tagline: string | null
+          description: string | null
+          image_url: string | null
+          notes: string[]
+          price: number
+          premium_topping_label: string | null
+          premium_topping_price: number
+          status: "live" | "coming_soon"
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          tagline?: string | null
+          description?: string | null
+          image_url?: string | null
+          notes?: string[]
+          price?: number
+          premium_topping_label?: string | null
+          premium_topping_price?: number
+          status?: "live" | "coming_soon"
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          tagline?: string | null
+          description?: string | null
+          image_url?: string | null
+          notes?: string[]
+          price?: number
+          premium_topping_label?: string | null
+          premium_topping_price?: number
+          status?: "live" | "coming_soon"
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: string | null

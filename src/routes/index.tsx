@@ -16,7 +16,7 @@ const giftingImg = "/assets/grain-crumbs/gifting-premium.png";
 const hero = "/assets/grain-crumbs/hero-premium.png";
 const cakeImg = "/assets/grain-crumbs/brownie-cake-feature.png";
 import { Reveal } from "@/components/Reveal";
-import { flavours } from "@/lib/flavours";
+import { useLiveProducts } from "@/lib/use-products";
 import { WHATSAPP_ORDER_URL, WHATSAPP_PLAIN_URL } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
@@ -309,6 +309,7 @@ function Collections() {
 }
 
 function Flavours() {
+  const { products: flavours } = useLiveProducts();
   return (
     <section className="section bg-[color:var(--cream-dark)]/40">
       <div className="container-prose">
