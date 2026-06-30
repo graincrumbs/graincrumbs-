@@ -1,35 +1,45 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Eye, EyeOff, KeyRound, Loader2, LogOut, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { Eye, EyeOff, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { AdminNav } from "@/components/admin/AdminNav";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
-
-export const Route = createFileRoute("/admin/products")({
-  head: () => ({ meta: [{ title: "Products — Admin — Grain Crumbs" }, { name: "robots", content: "noindex" }] }),
-  component: AdminProducts,
-});
-
-type Product = Tables<"products">;
-type ProductForm = Omit<TablesInsert<"products">, "id" | "created_at" | "updated_at">;
+import type { CookieTinVariant, ProductCollection } from "@/lib/product-collections";
 
 const ADMIN_EMAIL = "ankita.junankar@gmail.com";
 
 const inputCls =
   "w-full rounded-md border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-[color:var(--gold)] focus:ring-2 focus:ring-[color:var(--gold)]/30";
 
-const emptyForm: ProductForm = {
-  slug: "",
-  name: "",
-  tagline: "",
-  description: "",
-  image_url: "",
-  notes: [],
-  price: 0,
-  premium_topping_label: "",
-  premium_topping_price: 35,
-  status: "coming_soon",
-  sort_order: 0,
+type Product = Tables<"products">;
+type ProductForm = Omit<TablesInsert<"products">, "id" | "created_at" | "updated_at">;
+
+export type AdminProductsPanelConfig = {
+  collection: ProductCollection;
+  title: string;
+  navActive: "brownies" | "cookie_tins" | "lite" | "pro";
+  addLabel?: string;
+  showVariant?: boolean;
+  showPremiumTopping?: boolean;
 };
+
+function emptyForm(collection: ProductCollection, showVariant?: boolean): ProductForm {
+  return {
+    slug: "",
+    name: "",
+    tagline: "",
+    description: "",
+    image_url: "",
+    notes: [],
+    price: 0,
+    premium_topping_label: "",
+    premium_topping_price: 35,
+    status: "coming_soon",
+    sort_order: 0,
+    collection,
+    variant: showVariant ? "classic" : null,
+  };
+}
 
 function slugify(name: string) {
   return name
@@ -55,13 +65,26 @@ function StatusPill({ status }: { status: Product["status"] }) {
   );
 }
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 function ProductFormModal({
   product,
+  config,
   onCancel,
   onSave,
   saving,
 }: {
   product: Product | null;
+  config: AdminProductsPanelConfig;
   onCancel: () => void;
   onSave: (form: ProductForm) => void;
   saving: boolean;
@@ -80,8 +103,10 @@ function ProductFormModal({
           premium_topping_price: product.premium_topping_price,
           status: product.status,
           sort_order: product.sort_order,
+          collection: product.collection ?? config.collection,
+          variant: product.variant ?? null,
         }
-      : emptyForm
+      : emptyForm(config.collection, config.showVariant)
   );
   const [notesText, setNotesText] = useState((product?.notes ?? []).join(", "));
   const [uploading, setUploading] = useState(false);
@@ -114,13 +139,17 @@ function ProductFormModal({
   const submit = () => {
     onSave({
       ...form,
+      collection: config.collection,
       notes: notesText.split(",").map((n) => n.trim()).filter(Boolean),
       price: Number(form.price) || 0,
       premium_topping_price: Number(form.premium_topping_price) || 0,
+      variant: config.showVariant ? form.variant : null,
     });
   };
 
-  const valid = form.name.trim() && form.slug.trim() && Number(form.price) > 0;
+  const priceOk = form.status === "coming_soon" || Number(form.price) > 0;
+  const variantOk = !config.showVariant || !!form.variant;
+  const valid = form.name.trim() && form.slug.trim() && priceOk && variantOk;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm md:items-center md:p-4" onClick={onCancel}>
@@ -131,7 +160,7 @@ function ProductFormModal({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{product ? "Edit" : "New"}</p>
-            <h2 className="mt-2 font-display text-3xl">{product ? "Edit Product" : "Add Product"}</h2>
+            <h2 className="mt-2 font-display text-3xl">{product ? "Edit Item" : "Add Item"}</h2>
           </div>
           <button onClick={onCancel} className="text-2xl leading-none text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
@@ -139,11 +168,24 @@ function ProductFormModal({
         </div>
 
         <div className="mt-6 space-y-4">
-          <Field label="Product name">
+          {config.showVariant && (
+            <Field label="Range">
+              <select
+                value={form.variant ?? "classic"}
+                onChange={(e) => update("variant", e.target.value as CookieTinVariant)}
+                className={inputCls}
+              >
+                <option value="classic">Classic Cookie Cake Tins</option>
+                <option value="millet">Millet Cookie Cake Tins</option>
+              </select>
+            </Field>
+          )}
+
+          <Field label="Name">
             <input
               value={form.name}
               onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="e.g. Biscoff Brownie"
+              placeholder={config.collection === "cookie_tins" ? "e.g. Pistachio" : "e.g. Biscoff Brownie"}
               className={inputCls}
             />
           </Field>
@@ -152,40 +194,44 @@ function ProductFormModal({
             <input
               value={form.slug}
               onChange={(e) => update("slug", slugify(e.target.value))}
-              placeholder="biscoff-brownie"
+              placeholder="pistachio-cookie"
               className={`${inputCls} font-mono text-sm`}
             />
           </Field>
 
-          <Field label="Tagline">
-            <input
-              value={form.tagline ?? ""}
-              onChange={(e) => update("tagline", e.target.value)}
-              placeholder="A short, evocative line"
-              className={inputCls}
-            />
-          </Field>
+          {config.collection !== "cookie_tins" && (
+            <>
+              <Field label="Tagline">
+                <input
+                  value={form.tagline ?? ""}
+                  onChange={(e) => update("tagline", e.target.value)}
+                  placeholder="A short, evocative line"
+                  className={inputCls}
+                />
+              </Field>
 
-          <Field label="Description">
-            <textarea
-              value={form.description ?? ""}
-              onChange={(e) => update("description", e.target.value)}
-              rows={3}
-              placeholder="What makes this flavour special"
-              className={`${inputCls} resize-none`}
-            />
-          </Field>
+              <Field label="Description">
+                <textarea
+                  value={form.description ?? ""}
+                  onChange={(e) => update("description", e.target.value)}
+                  rows={3}
+                  placeholder="What makes this flavour special"
+                  className={`${inputCls} resize-none`}
+                />
+              </Field>
 
-          <Field label="Notes (comma separated — ingredients shown as pill tags)">
-            <input
-              value={notesText}
-              onChange={(e) => setNotesText(e.target.value)}
-              placeholder="Ragi, Oats, Jaggery, Couverture Chocolate"
-              className={inputCls}
-            />
-          </Field>
+              <Field label="Notes (comma separated)">
+                <input
+                  value={notesText}
+                  onChange={(e) => setNotesText(e.target.value)}
+                  placeholder="Ragi, Oats, Jaggery, Couverture Chocolate"
+                  className={inputCls}
+                />
+              </Field>
+            </>
+          )}
 
-          <Field label="Product image">
+          <Field label="Image">
             <div className="flex items-center gap-3">
               {form.image_url && (
                 <img src={form.image_url} alt="" className="h-14 w-14 rounded-lg object-cover ring-1 ring-border" />
@@ -224,24 +270,26 @@ function ProductFormModal({
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Premium topping label">
-              <input
-                value={form.premium_topping_label ?? ""}
-                onChange={(e) => update("premium_topping_label", e.target.value)}
-                placeholder="Premium Chocolate Toppings"
-                className={inputCls}
-              />
-            </Field>
-            <Field label="Premium topping price (₹)">
-              <input
-                type="number"
-                value={form.premium_topping_price}
-                onChange={(e) => update("premium_topping_price", Number(e.target.value))}
-                className={inputCls}
-              />
-            </Field>
-          </div>
+          {config.showPremiumTopping && (
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Premium topping label">
+                <input
+                  value={form.premium_topping_label ?? ""}
+                  onChange={(e) => update("premium_topping_label", e.target.value)}
+                  placeholder="Premium Chocolate Toppings"
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="Premium topping price (₹)">
+                <input
+                  type="number"
+                  value={form.premium_topping_price}
+                  onChange={(e) => update("premium_topping_price", Number(e.target.value))}
+                  className={inputCls}
+                />
+              </Field>
+            </div>
+          )}
         </div>
 
         <div className="mt-7 flex gap-3">
@@ -253,21 +301,10 @@ function ProductFormModal({
             disabled={!valid || saving}
             className="btn-primary flex-1 justify-center disabled:opacity-40"
           >
-            {saving ? "Saving…" : product ? "Save changes" : "Add product"}
+            {saving ? "Saving…" : product ? "Save changes" : "Add item"}
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </label>
-      {children}
     </div>
   );
 }
@@ -276,7 +313,7 @@ function ConfirmDelete({ name, onCancel, onConfirm }: { name: string; onCancel: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onCancel}>
       <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-[1.5rem] border border-border bg-card p-6">
-        <h3 className="font-display text-2xl">Remove this product?</h3>
+        <h3 className="font-display text-2xl">Remove this item?</h3>
         <p className="mt-2 text-sm text-muted-foreground">
           “{name}” will disappear from the website immediately. This can't be undone.
         </p>
@@ -296,12 +333,13 @@ function ConfirmDelete({ name, onCancel, onConfirm }: { name: string; onCancel: 
   );
 }
 
-function AdminProducts() {
+export function AdminProductsPanel({ config }: { config: AdminProductsPanelConfig }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | Product["status"]>("all");
+  const [variantFilter, setVariantFilter] = useState<"all" | CookieTinVariant>("all");
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState<Product | null>(null);
@@ -309,7 +347,11 @@ function AdminProducts() {
   const [error, setError] = useState<string | null>(null);
 
   const loadProducts = async () => {
-    const { data, error } = await supabase.from("products").select("*").order("sort_order", { ascending: true });
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("collection", config.collection)
+      .order("sort_order", { ascending: true });
     if (!error && data) setProducts(data);
   };
 
@@ -339,18 +381,19 @@ function AdminProducts() {
     return () => {
       cancelled = true;
     };
-  }, [navigate]);
+  }, [navigate, config.collection]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (filter !== "all" && p.status !== filter) return false;
+      if (config.showVariant && variantFilter !== "all" && p.variant !== variantFilter) return false;
       if (q) {
         const s = q.toLowerCase();
         if (!p.name.toLowerCase().includes(s) && !p.slug.toLowerCase().includes(s)) return false;
       }
       return true;
     });
-  }, [products, filter, q]);
+  }, [products, filter, variantFilter, q, config.showVariant]);
 
   const toggleStatus = async (p: Product) => {
     const next = p.status === "live" ? "coming_soon" : "live";
@@ -414,20 +457,10 @@ function AdminProducts() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="divider-gold eyebrow">Admin</p>
-            <h1 className="mt-3 font-display text-4xl md:text-5xl">Products</h1>
+            <h1 className="mt-3 font-display text-4xl md:text-5xl">{config.title}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{filtered.length} of {products.length} items</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link to="/admin" className="btn-outline">Orders</Link>
-            <Link to="/admin/cake-flavours" className="btn-outline">Cakes</Link>
-            <Link to="/admin/pages" className="btn-outline">Pages</Link>
-            <Link to="/admin/change-password" className="btn-outline">
-              <KeyRound className="h-4 w-4" /> Change Password
-            </Link>
-            <button onClick={signOut} className="btn-outline">
-              <LogOut className="h-4 w-4" /> Sign out
-            </button>
-          </div>
+          <AdminNav active={config.navActive} onSignOut={signOut} />
         </div>
 
         {error && (
@@ -435,17 +468,17 @@ function AdminProducts() {
         )}
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative min-w-[200px] flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search product, slug..."
+              placeholder="Search name, slug..."
               className={`${inputCls} pl-11`}
             />
           </div>
           <button onClick={() => setAdding(true)} className="btn-primary whitespace-nowrap">
-            <Plus className="h-4 w-4" /> Add product
+            <Plus className="h-4 w-4" /> {config.addLabel ?? "Add product"}
           </button>
         </div>
 
@@ -463,41 +496,59 @@ function AdminProducts() {
               {f === "all" ? "All" : f === "live" ? "Live" : "Coming Soon"}
             </button>
           ))}
+          {config.showVariant &&
+            (["all", "classic", "millet"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setVariantFilter(v)}
+                className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] transition ${
+                  variantFilter === v
+                    ? "border-[color:var(--gold)] bg-[color:var(--gold)]/20 text-[color:var(--chocolate-dark)]"
+                    : "border-border hover:border-[color:var(--gold)]"
+                }`}
+              >
+                {v === "all" ? "All ranges" : v === "classic" ? "Classic" : "Millet"}
+              </button>
+            ))}
         </div>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-border">
           {filtered.length === 0 ? (
             <div className="py-16 text-center text-sm text-muted-foreground">
-              No products match. Try a different search or filter.
+              No items match. Try a different search or filter.
             </div>
           ) : (
             <div className="divide-y divide-border">
               {filtered.map((p) => (
-                <div key={p.id} className="flex flex-wrap items-center gap-4 px-5 py-4 hover:bg-[color:var(--cream-dark)]/30 transition">
+                <div key={p.id} className="flex flex-wrap items-center gap-4 px-5 py-4 transition hover:bg-[color:var(--cream-dark)]/30">
                   {p.image_url && (
                     <img src={p.image_url} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-border" />
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-display text-lg">{p.name}</p>
-                    <p className="text-sm text-muted-foreground">{p.slug} · ₹{p.price}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {p.slug}
+                      {config.showVariant && p.variant ? ` · ${p.variant}` : ""}
+                      {p.price > 0 ? ` · ₹${p.price}` : ""}
+                    </p>
                   </div>
                   <StatusPill status={p.status} />
                   <button
                     onClick={() => toggleStatus(p)}
                     title={p.status === "live" ? "Set to Coming Soon" : "Make live"}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border hover:border-[color:var(--gold)] transition"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition hover:border-[color:var(--gold)]"
                   >
                     {p.status === "live" ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
                   <button
                     onClick={() => setEditing(p)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border hover:border-[color:var(--gold)] transition"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition hover:border-[color:var(--gold)]"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => setDeleting(p)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-red-300 text-red-700 hover:bg-red-50 transition"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-red-300 text-red-700 transition hover:bg-red-50"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -509,10 +560,10 @@ function AdminProducts() {
       </div>
 
       {adding && (
-        <ProductFormModal product={null} saving={saving} onCancel={() => setAdding(false)} onSave={saveProduct} />
+        <ProductFormModal product={null} config={config} saving={saving} onCancel={() => setAdding(false)} onSave={saveProduct} />
       )}
       {editing && (
-        <ProductFormModal product={editing} saving={saving} onCancel={() => setEditing(null)} onSave={saveProduct} />
+        <ProductFormModal product={editing} config={config} saving={saving} onCancel={() => setEditing(null)} onSave={saveProduct} />
       )}
       {deleting && (
         <ConfirmDelete name={deleting.name} onCancel={() => setDeleting(null)} onConfirm={confirmDelete} />

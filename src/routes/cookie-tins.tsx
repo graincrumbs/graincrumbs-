@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Reveal } from "@/components/Reveal";
 import { NotifyMeForm } from "@/components/NotifyMeForm";
+import { useSitePage } from "@/lib/use-site-page";
 import {
   Heart, Gift, Package, Wheat, Leaf, Ban,
   BadgeCheck, Star, Cookie, Sparkles, Users
@@ -61,6 +62,7 @@ function HeartDivider() {
 }
 
 function Page() {
+  const { page } = useSitePage("cookie-tins");
   return (
     <>
       {/* ── HERO ── */}
@@ -71,24 +73,24 @@ function Page() {
               <span aria-hidden>←</span> Explore Our Brownies
             </Link>
             <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/60 bg-[color:var(--cream)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--chocolate)]">
-              Coming Soon
+              {page.status === "live" ? "Now Live" : "Coming Soon"}
             </span>
-            <p className="eyebrow mt-5 text-[color:var(--gold)]">Grain Crumbs · Cookie Cake Tins</p>
+            <p className="eyebrow mt-5 text-[color:var(--gold)]">{page.eyebrow}</p>
             <h1 className="mt-4 font-display text-[clamp(2.4rem,7vw,4.5rem)] leading-[1.05] tracking-tight">
-              Cookies Worth
-              <span className="block italic text-[color:var(--chocolate)]">Sharing.</span>
+              {page.title_line1}
+              <span className="block italic text-[color:var(--chocolate)]">{page.title_line2}</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Thoughtfully baked Cookie Cake Tins crafted for gifting, celebrations and everyday indulgence. Whether you love classic flavours or wholesome millet creations, there's a Grain Crumbs Cookie Cake Tin waiting for you.
+              {page.description}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#notify" className="btn-primary">Notify Me When Available</a>
+              <a href="#notify" className="btn-primary">{page.cta_label}</a>
               <Link to="/brownies" className="btn-outline">Explore Our Brownies</Link>
             </div>
           </Reveal>
           <Reveal delay={150}>
             <div className="relative overflow-hidden rounded-[2rem] shadow-[var(--shadow-warm)]" style={{ maskImage: "radial-gradient(ellipse 85% 90% at 50% 50%, black 42%, transparent 84%)" }}>
-              <img src="/assets/grain-crumbs/cookie-tins/cookie-main-new.png" alt="Beautifully arranged Cookie Cake Tin with assorted cookies" width={900} height={1000} className="h-full w-full object-cover" />
+              <img src={page.hero_image_url ?? ""} alt="Beautifully arranged Cookie Cake Tin with assorted cookies" width={900} height={1000} className="h-full w-full object-cover" />
             </div>
           </Reveal>
         </div>

@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      site_pages: {
+        Row: {
+          id: string
+          slug: string
+          status: "live" | "coming_soon"
+          eyebrow: string | null
+          title_line1: string | null
+          title_line2: string | null
+          description: string | null
+          hero_image_url: string | null
+          cta_label: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          status?: "live" | "coming_soon"
+          eyebrow?: string | null
+          title_line1?: string | null
+          title_line2?: string | null
+          description?: string | null
+          hero_image_url?: string | null
+          cta_label?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          status?: "live" | "coming_soon"
+          eyebrow?: string | null
+          title_line1?: string | null
+          title_line2?: string | null
+          description?: string | null
+          hero_image_url?: string | null
+          cta_label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cake_flavours: {
         Row: {
           id: string

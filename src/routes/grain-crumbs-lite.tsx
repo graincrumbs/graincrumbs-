@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Reveal } from "@/components/Reveal";
 import { NotifyMeForm } from "@/components/NotifyMeForm";
+import { useSitePage } from "@/lib/use-site-page";
 import {
   Leaf, Ban, TrendingDown, Heart, Wheat, Shield, Star,
   CheckCircle2, Zap, Cookie, BadgeCheck, ArrowRight, Clock
@@ -67,11 +68,12 @@ const comparisonRows = [
 ];
 
 function Page() {
+  const { page } = useSitePage("grain-crumbs-lite");
   return (
     <>
       {/* ── HERO ── */}
       <section className="relative overflow-hidden border-b border-border/60 bg-[color:var(--cream-dark)]/40">
-        <div className="absolute inset-0 bg-[url('/assets/grain-crumbs/lite/lite-hero.png')] bg-cover bg-center opacity-10" />
+        <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: `url('${page.hero_image_url ?? ""}')` }} />
         <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--cream)]/90 to-[color:var(--cream)]" />
         <div className="container-prose relative grid items-center gap-12 py-20 md:grid-cols-2 md:py-28">
           <Reveal>
@@ -83,18 +85,18 @@ function Page() {
               <span aria-hidden>←</span> Back to Classic Collection
             </Link>
             <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/60 bg-[color:var(--cream)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--chocolate)]">
-              Coming Soon
+              {page.status === "live" ? "Now Live" : "Coming Soon"}
             </span>
-            <p className="eyebrow mt-5 text-[color:var(--gold)]">Grain Crumbs · Lite</p>
+            <p className="eyebrow mt-5 text-[color:var(--gold)]">{page.eyebrow}</p>
             <h1 className="mt-4 font-display text-[clamp(2.4rem,7vw,4.5rem)] leading-[1.05] tracking-tight">
-              Grain Crumbs Lite.
-              <span className="block italic text-[color:var(--chocolate)]">Lighter sweetness. Same indulgence.</span>
+              {page.title_line1}
+              <span className="block italic text-[color:var(--chocolate)]">{page.title_line2}</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Thoughtfully crafted for people who want to enjoy dessert with reduced added sugar — without compromising on taste.
+              {page.description}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#notify" className="btn-primary">Notify Me When Available</a>
+              <a href="#notify" className="btn-primary">{page.cta_label}</a>
               <Link to="/brownies" className="btn-outline">Back to Classic</Link>
             </div>
           </Reveal>

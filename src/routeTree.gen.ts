@@ -23,8 +23,12 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminProRouteImport } from './routes/admin.pro'
+import { Route as AdminPagesRouteImport } from './routes/admin.pages'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminLiteRouteImport } from './routes/admin.lite'
 import { Route as AdminForgotPasswordRouteImport } from './routes/admin.forgot-password'
+import { Route as AdminCookieTinsRouteImport } from './routes/admin.cookie-tins'
 import { Route as AdminChangePasswordRouteImport } from './routes/admin.change-password'
 import { Route as AdminCakeFlavoursRouteImport } from './routes/admin.cake-flavours'
 
@@ -98,14 +102,34 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
   path: '/admin/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProRoute = AdminProRouteImport.update({
+  id: '/admin/pro',
+  path: '/admin/pro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPagesRoute = AdminPagesRouteImport.update({
+  id: '/admin/pages',
+  path: '/admin/pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLiteRoute = AdminLiteRouteImport.update({
+  id: '/admin/lite',
+  path: '/admin/lite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminForgotPasswordRoute = AdminForgotPasswordRouteImport.update({
   id: '/admin/forgot-password',
   path: '/admin/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCookieTinsRoute = AdminCookieTinsRouteImport.update({
+  id: '/admin/cookie-tins',
+  path: '/admin/cookie-tins',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminChangePasswordRoute = AdminChangePasswordRouteImport.update({
@@ -134,8 +158,12 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
+  '/admin/cookie-tins': typeof AdminCookieTinsRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
+  '/admin/lite': typeof AdminLiteRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/pages': typeof AdminPagesRoute
+  '/admin/pro': typeof AdminProRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -154,8 +182,12 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
+  '/admin/cookie-tins': typeof AdminCookieTinsRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
+  '/admin/lite': typeof AdminLiteRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/pages': typeof AdminPagesRoute
+  '/admin/pro': typeof AdminProRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -175,8 +207,12 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
+  '/admin/cookie-tins': typeof AdminCookieTinsRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
+  '/admin/lite': typeof AdminLiteRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/pages': typeof AdminPagesRoute
+  '/admin/pro': typeof AdminProRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -197,8 +233,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/cake-flavours'
     | '/admin/change-password'
+    | '/admin/cookie-tins'
     | '/admin/forgot-password'
+    | '/admin/lite'
     | '/admin/login'
+    | '/admin/pages'
+    | '/admin/pro'
     | '/admin/products'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -217,8 +257,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/cake-flavours'
     | '/admin/change-password'
+    | '/admin/cookie-tins'
     | '/admin/forgot-password'
+    | '/admin/lite'
     | '/admin/login'
+    | '/admin/pages'
+    | '/admin/pro'
     | '/admin/products'
     | '/admin'
   id:
@@ -237,8 +281,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/cake-flavours'
     | '/admin/change-password'
+    | '/admin/cookie-tins'
     | '/admin/forgot-password'
+    | '/admin/lite'
     | '/admin/login'
+    | '/admin/pages'
+    | '/admin/pro'
     | '/admin/products'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -258,8 +306,12 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminCakeFlavoursRoute: typeof AdminCakeFlavoursRoute
   AdminChangePasswordRoute: typeof AdminChangePasswordRoute
+  AdminCookieTinsRoute: typeof AdminCookieTinsRoute
   AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
+  AdminLiteRoute: typeof AdminLiteRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminPagesRoute: typeof AdminPagesRoute
+  AdminProRoute: typeof AdminProRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -364,6 +416,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/pro': {
+      id: '/admin/pro'
+      path: '/admin/pro'
+      fullPath: '/admin/pro'
+      preLoaderRoute: typeof AdminProRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/pages': {
+      id: '/admin/pages'
+      path: '/admin/pages'
+      fullPath: '/admin/pages'
+      preLoaderRoute: typeof AdminPagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -371,11 +437,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/lite': {
+      id: '/admin/lite'
+      path: '/admin/lite'
+      fullPath: '/admin/lite'
+      preLoaderRoute: typeof AdminLiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/forgot-password': {
       id: '/admin/forgot-password'
       path: '/admin/forgot-password'
       fullPath: '/admin/forgot-password'
       preLoaderRoute: typeof AdminForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/cookie-tins': {
+      id: '/admin/cookie-tins'
+      path: '/admin/cookie-tins'
+      fullPath: '/admin/cookie-tins'
+      preLoaderRoute: typeof AdminCookieTinsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/change-password': {
@@ -410,8 +490,12 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminCakeFlavoursRoute: AdminCakeFlavoursRoute,
   AdminChangePasswordRoute: AdminChangePasswordRoute,
+  AdminCookieTinsRoute: AdminCookieTinsRoute,
   AdminForgotPasswordRoute: AdminForgotPasswordRoute,
+  AdminLiteRoute: AdminLiteRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminPagesRoute: AdminPagesRoute,
+  AdminProRoute: AdminProRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

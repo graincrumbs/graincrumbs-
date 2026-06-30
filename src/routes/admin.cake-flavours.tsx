@@ -331,6 +331,7 @@ function AdminCakeFlavours() {
           <div className="flex flex-wrap gap-3">
             <Link to="/admin" className="btn-outline">Orders</Link>
             <Link to="/admin/products" className="btn-outline">Brownies</Link>
+            <Link to="/admin/pages" className="btn-outline">Pages</Link>
             <Link to="/admin/change-password" className="btn-outline">
               <KeyRound className="h-4 w-4" /> Change Password
             </Link>

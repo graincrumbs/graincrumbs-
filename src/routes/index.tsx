@@ -17,6 +17,7 @@ const hero = "/assets/grain-crumbs/hero-premium.png";
 const cakeImg = "/assets/grain-crumbs/brownie-cake-feature.png";
 import { Reveal } from "@/components/Reveal";
 import { useLiveProducts } from "@/lib/use-products";
+import { useSitePage } from "@/lib/use-site-page";
 import { WHATSAPP_ORDER_URL, WHATSAPP_PLAIN_URL } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
@@ -258,6 +259,13 @@ const collections = [
 ];
 
 function Collections() {
+  const { page: litePage } = useSitePage("grain-crumbs-lite");
+  const { page: proPage } = useSitePage("grain-crumbs-pro");
+  const { page: cookiePage } = useSitePage("cookie-tins");
+  const statusFor = (slug: string) => {
+    const page = slug === "grain-crumbs-lite" ? litePage : slug === "grain-crumbs-pro" ? proPage : cookiePage;
+    return page.status === "live" ? { status: "Available now", available: true } : { status: "Coming soon", available: false };
+  };
   return (
     <section id="collections" className="section scroll-mt-24">
       <div className="container-prose">
@@ -273,23 +281,25 @@ function Collections() {
         </Reveal>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {collections.map((c, i) => (
+          {collections.map((c, i) => {
+            const live = c.available ? { status: c.status, available: c.available } : statusFor(c.to.replace("/", ""));
+            return (
             <Reveal key={c.name} delay={i * 100}>
-              <article className={`relative flex h-full flex-col rounded-2xl border p-7 transition-all ${c.available ? "border-[color:var(--chocolate-dark)] bg-[color:var(--chocolate-dark)] text-[color:var(--cream)]" : "border-border bg-card"}`}>
-                <span className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.25em] ${c.available ? "bg-[color:var(--gold)] text-[color:var(--chocolate-dark)]" : "border border-border text-muted-foreground"}`}>
-                  {c.status}
+              <article className={`relative flex h-full flex-col rounded-2xl border p-7 transition-all ${live.available ? "border-[color:var(--chocolate-dark)] bg-[color:var(--chocolate-dark)] text-[color:var(--cream)]" : "border-border bg-card"}`}>
+                <span className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.25em] ${live.available ? "bg-[color:var(--gold)] text-[color:var(--chocolate-dark)]" : "border border-border text-muted-foreground"}`}>
+                  {live.status}
                 </span>
-                <h3 className={`mt-5 font-display text-2xl ${c.available ? "text-[color:var(--cream)]" : ""}`}>{c.name}</h3>
+                <h3 className={`mt-5 font-display text-2xl ${live.available ? "text-[color:var(--cream)]" : ""}`}>{c.name}</h3>
                 <ul className="mt-5 space-y-2.5 text-sm">
                   {c.points.map((p) => (
                     <li key={p} className="flex items-start gap-2">
-                      <span className={`mt-2 inline-block h-1 w-3 ${c.available ? "bg-[color:var(--gold)]" : "bg-[color:var(--chocolate)]"}`} />
+                      <span className={`mt-2 inline-block h-1 w-3 ${live.available ? "bg-[color:var(--gold)]" : "bg-[color:var(--chocolate)]"}`} />
                       {p}
                     </li>
                   ))}
                 </ul>
                 <div className="mt-auto pt-7">
-                  {c.available ? (
+                  {live.available ? (
                     <Link to={c.to} className="inline-flex items-center gap-2 text-sm font-medium tracking-wide text-[color:var(--gold-soft)] hover:text-[color:var(--gold)]">
                       Order the classic <ArrowRight className="h-4 w-4" />
                     </Link>
@@ -301,7 +311,8 @@ function Collections() {
                 </div>
               </article>
             </Reveal>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

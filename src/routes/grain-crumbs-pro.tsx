@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Reveal } from "@/components/Reveal";
 import { NotifyMeForm } from "@/components/NotifyMeForm";
+import { useSitePage } from "@/lib/use-site-page";
 import {
   Leaf, Ban, TrendingDown, Heart, Wheat, Shield,
   CheckCircle2, Zap, Cookie, BadgeCheck, Dumbbell, Activity,
@@ -120,6 +121,7 @@ function HeartDivider() {
 }
 
 function Page() {
+  const { page } = useSitePage("grain-crumbs-pro");
   return (
     <>
       {/* ── HERO ── */}
@@ -135,25 +137,25 @@ function Page() {
               <span aria-hidden>←</span> Back to Classic Collection
             </Link>
             <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/60 bg-[color:var(--cream)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--chocolate)]">
-              Coming Soon
+              {page.status === "live" ? "Now Live" : "Coming Soon"}
             </span>
-            <p className="eyebrow mt-5 text-[color:var(--gold)]">Grain Crumbs · Pro</p>
+            <p className="eyebrow mt-5 text-[color:var(--gold)]">{page.eyebrow}</p>
             <h1 className="mt-4 font-display text-[clamp(2.4rem,7vw,4.5rem)] leading-[1.05] tracking-tight">
-              Protein Meets
-              <span className="block italic text-[color:var(--chocolate)]">Indulgence.</span>
+              {page.title_line1}
+              <span className="block italic text-[color:var(--chocolate)]">{page.title_line2}</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              High-protein brownies thoughtfully crafted for fitness enthusiasts, gym-goers and active lifestyles — because healthy eating should still feel indulgent.
+              {page.description}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#notify" className="btn-primary">Notify Me When Available</a>
+              <a href="#notify" className="btn-primary">{page.cta_label}</a>
               <Link to="/brownies" className="btn-outline">Back to Classic Collection</Link>
             </div>
           </Reveal>
           <Reveal delay={150}>
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-[var(--shadow-warm)]">
               <img
-                src={proImages.hero}
+                src={page.hero_image_url ?? proImages.hero}
                 alt="Grain Crumbs Pro — premium brownie stack"
                 width={900}
                 height={1100}
