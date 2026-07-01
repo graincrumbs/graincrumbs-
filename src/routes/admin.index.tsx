@@ -168,7 +168,7 @@ function AdminDashboard() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link to="/admin/analytics" className="btn-outline">Analytics</Link>
-            <Link to="/admin/products" className="btn-outline">Products</Link>
+            <Link to="/admin/products" className="btn-outline">Brownies</Link>
             <Link to="/admin/cake-flavours" className="btn-outline">Cakes</Link>
             <Link to="/admin/pages" className="btn-outline">Pages</Link>
             <Link to="/admin/change-password" className="btn-outline">
