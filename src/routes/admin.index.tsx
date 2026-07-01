@@ -167,6 +167,7 @@ function AdminDashboard() {
             <p className="mt-2 text-sm text-muted-foreground">{filtered.length} of {orders.length} enquiries</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link to="/admin/analytics" className="btn-outline">Analytics</Link>
             <Link to="/admin/products" className="btn-outline">Products</Link>
             <Link to="/admin/cake-flavours" className="btn-outline">Cakes</Link>
             <Link to="/admin/pages" className="btn-outline">Pages</Link>
@@ -204,7 +205,8 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-[1.5rem] border border-border bg-card">
+        {/* Desktop table */}
+        <div className="mt-8 hidden md:block overflow-hidden rounded-[1.5rem] border border-border bg-card">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[color:var(--cream-dark)]/40 text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -233,7 +235,6 @@ function AdminDashboard() {
                   >
                     <td className="px-4 py-3 font-mono text-sm font-semibold text-[color:var(--chocolate-dark)]">#{o.order_number}</td>
                     <td className="px-4 py-3 font-medium">{o.name}</td>
-                    {/* ── CHANGED: phone is now a tappable WhatsApp link ── */}
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <a
                         href={toWhatsAppUrl(o.phone)}
@@ -267,6 +268,56 @@ function AdminDashboard() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile cards */}
+        <div className="mt-6 md:hidden space-y-3">
+          {filtered.length === 0 ? (
+            <p className="py-12 text-center text-sm text-muted-foreground">No orders found.</p>
+          ) : filtered.map((o) => (
+            <div
+              key={o.id}
+              onClick={() => { setActive(o); setLightbox(false); }}
+              className={`cursor-pointer rounded-2xl border border-border bg-card p-4 transition hover:border-[color:var(--gold)]/60 active:scale-[0.99] ${
+                isAssortedBoxOrder(o.flavour) ? "border-[color:var(--gold)]/30 bg-[color:var(--gold)]/5" : ""
+              }`}
+            >
+              {/* Top row: order number + status */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-sm font-bold text-[color:var(--chocolate-dark)]">#{o.order_number}</span>
+                <span className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${STATUS_STYLES[o.status]}`}>{o.status}</span>
+              </div>
+
+              {/* Customer name */}
+              <p className="mt-2 font-display text-xl text-[color:var(--chocolate-dark)]">{o.name}</p>
+
+              {/* Product + flavour */}
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {o.product_type}
+                {o.flavour ? ` · ${isAssortedBoxOrder(o.flavour) ? "🎁 Assorted Box" : o.flavour}` : ""}
+                {o.weight ? ` · ${qtyDisplay(o)}` : ""}
+              </p>
+
+              {/* Dates row */}
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span>Ordered {formatDate(o.created_at)}</span>
+                {o.date_required && <span>Required {formatDate(o.date_required)}</span>}
+              </div>
+
+              {/* WhatsApp button — stop propagation so tapping it doesn't open modal */}
+              <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                <a
+                  href={toWhatsAppUrl(o.phone)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-3 py-1.5 text-xs font-medium text-[color:var(--chocolate-dark)] hover:bg-[color:var(--gold)]/20 transition-colors"
+                >
+                  <MessageCircle className="h-3.5 w-3.5 text-[color:var(--gold)]" />
+                  {o.phone}
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

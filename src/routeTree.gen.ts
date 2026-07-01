@@ -31,6 +31,7 @@ import { Route as AdminForgotPasswordRouteImport } from './routes/admin.forgot-p
 import { Route as AdminCookieTinsRouteImport } from './routes/admin.cookie-tins'
 import { Route as AdminChangePasswordRouteImport } from './routes/admin.change-password'
 import { Route as AdminCakeFlavoursRouteImport } from './routes/admin.cake-flavours'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -142,6 +143,11 @@ const AdminCakeFlavoursRoute = AdminCakeFlavoursRouteImport.update({
   path: '/admin/cake-flavours',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/grain-crumbs-pro': typeof GrainCrumbsProRoute
   '/order': typeof OrderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/cookie-tins': typeof AdminCookieTinsRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/grain-crumbs-pro': typeof GrainCrumbsProRoute
   '/order': typeof OrderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/cookie-tins': typeof AdminCookieTinsRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/grain-crumbs-pro': typeof GrainCrumbsProRoute
   '/order': typeof OrderRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/cake-flavours': typeof AdminCakeFlavoursRoute
   '/admin/change-password': typeof AdminChangePasswordRoute
   '/admin/cookie-tins': typeof AdminCookieTinsRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/grain-crumbs-pro'
     | '/order'
     | '/sitemap.xml'
+    | '/admin/analytics'
     | '/admin/cake-flavours'
     | '/admin/change-password'
     | '/admin/cookie-tins'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/grain-crumbs-pro'
     | '/order'
     | '/sitemap.xml'
+    | '/admin/analytics'
     | '/admin/cake-flavours'
     | '/admin/change-password'
     | '/admin/cookie-tins'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/grain-crumbs-pro'
     | '/order'
     | '/sitemap.xml'
+    | '/admin/analytics'
     | '/admin/cake-flavours'
     | '/admin/change-password'
     | '/admin/cookie-tins'
@@ -304,6 +316,7 @@ export interface RootRouteChildren {
   GrainCrumbsProRoute: typeof GrainCrumbsProRoute
   OrderRoute: typeof OrderRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCakeFlavoursRoute: typeof AdminCakeFlavoursRoute
   AdminChangePasswordRoute: typeof AdminChangePasswordRoute
   AdminCookieTinsRoute: typeof AdminCookieTinsRoute
@@ -472,6 +485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCakeFlavoursRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -488,6 +508,7 @@ const rootRouteChildren: RootRouteChildren = {
   GrainCrumbsProRoute: GrainCrumbsProRoute,
   OrderRoute: OrderRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCakeFlavoursRoute: AdminCakeFlavoursRoute,
   AdminChangePasswordRoute: AdminChangePasswordRoute,
   AdminCookieTinsRoute: AdminCookieTinsRoute,
