@@ -172,6 +172,7 @@ function OrderPage() {
       form.type === "Bulk / Corporate Order" && form.corporateNotes && `Additional Requirements: ${form.corporateNotes}`,
       `Delivery: ${form.delivery}`,
       form.delivery === "Delivery" && form.address && `Address: ${form.address}`,
+      form.delivery === "Delivery" && form.pincode && `Pincode: ${form.pincode}`,
       form.type !== "Bulk / Corporate Order" && `Occasion: ${form.occasion}`,
       form.date && `Date required: ${form.date}`,
       form.notes && `Notes: ${form.notes}`,
@@ -186,6 +187,17 @@ function OrderPage() {
     if (!email) {
       alert("Please enter your email address so we can send your confirmation email.");
       return;
+    }
+
+    if (form.delivery === "Delivery") {
+      if (!form.address.trim()) {
+        alert("Please enter your delivery address.");
+        return;
+      }
+      if (!/^\d{6}$/.test(form.pincode)) {
+        alert("Please enter a valid 6-digit delivery pincode.");
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -243,6 +255,7 @@ function OrderPage() {
           : form.type === "Gift Box" ? form.giftTheme : null,
         delivery: form.delivery,
         address: form.delivery === "Delivery" ? form.address : null,
+        pincode: form.delivery === "Delivery" ? form.pincode : null,
         occasion: form.type !== "Bulk / Corporate Order" ? form.occasion : null,
         date_required: form.date || null,
         notes: cartNotes,
@@ -625,13 +638,15 @@ function OrderPage() {
                 </Field>
                 {form.delivery === "Delivery" && (
                   <>
-                    <Field label="Delivery Address" full>
+                    <Field label="Delivery Address" required full>
                       <textarea required value={form.address} onChange={(e) => update("address", e.target.value)} className={`${inputCls} min-h-24`} placeholder="Full address, landmark, pincode" />
                     </Field>
-                    <Field label="Delivery Pincode" full>
+                    <Field label="Delivery Pincode" required full>
                       <input
+                        required
                         inputMode="numeric"
                         pattern="\d{6}"
+                        title="Please enter a valid 6-digit pincode"
                         maxLength={6}
                         value={form.pincode}
                         onChange={(e) => update("pincode", e.target.value.replace(/\D/g, "").slice(0, 6))}
