@@ -3,6 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string;
 
 function urlBase64ToUint8Array(base64String: string) {
+  if (!base64String) {
+    throw new Error("Missing VAPID public key for push registration.");
+  }
+
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
   const raw = atob(base64);
