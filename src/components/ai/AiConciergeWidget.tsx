@@ -19,6 +19,32 @@ export function AiConciergeWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { generate, loading } = useAiAssistant("concierge");
 
+  // Lock the page behind the widget from scrolling while it's open. Without
+  // this, on mobile a touch-scroll or the keyboard opening on input focus
+  // can bleed through the fixed overlay and scroll the site underneath.
+  useEffect(() => {
+    if (!open) return;
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+    const previousPosition = body.style.position;
+    const previousWidth = body.style.width;
+    const scrollY = window.scrollY;
+
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+
+    return () => {
+      body.style.overflow = previousOverflow;
+      body.style.position = previousPosition;
+      body.style.width = previousWidth;
+      body.style.top = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
@@ -76,7 +102,7 @@ export function AiConciergeWidget() {
             </button>
           </div>
 
-          <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+          <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
             {messages.map((m, i) => (
               <div
                 key={`${m.role}-${i}`}
