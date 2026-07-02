@@ -16,6 +16,7 @@ export function AiConciergeWidget() {
     },
   ]);
   const [provider, setProvider] = useState<string>("Smart assistant");
+  const [hideOnFooter, setHideOnFooter] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { generate, loading } = useAiAssistant("concierge");
 
@@ -49,6 +50,21 @@ export function AiConciergeWidget() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
+  useEffect(() => {
+    const footer = document.querySelector("footer");
+    if (!footer || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setHideOnFooter(entry.isIntersecting);
+      },
+      { rootMargin: "0px", threshold: 0.1 }
+    );
+
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
   const send = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
@@ -64,11 +80,13 @@ export function AiConciergeWidget() {
     }
   };
 
-  const starters = messages.length <= 1 ? CONCIERGE_STARTERS : [];
+  const starters = !loading && messages.length > 0 && messages[messages.length - 1].role === "assistant"
+    ? CONCIERGE_STARTERS
+    : [];
 
   return (
     <>
-      {!open && (
+      {!open && !hideOnFooter && (
         <button
           type="button"
           onClick={() => setOpen(true)}
