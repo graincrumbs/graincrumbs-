@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { KeyRound, Loader2, LogOut, MessageCircle, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { PushNotificationToggle } from "@/components/admin/PushNotificationToggle";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Admin Dashboard — Grain Crumbs" }, { name: "robots", content: "noindex" }] }),
@@ -167,6 +168,7 @@ function AdminDashboard() {
             <p className="mt-2 text-sm text-muted-foreground">{filtered.length} of {orders.length} enquiries</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <PushNotificationToggle />
             <Link to="/admin/analytics" className="btn-outline">Analytics</Link>
             <Link to="/admin/products" className="btn-outline">Brownies</Link>
             <Link to="/admin/cake-flavours" className="btn-outline">Cakes</Link>

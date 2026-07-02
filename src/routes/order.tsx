@@ -265,6 +265,9 @@ function OrderPage() {
       if (error) throw error;
 
       const newOrderNumber = data?.order_number ?? null;
+      supabase.functions.invoke("notify-admin-order", {
+        body: { orderNumber: newOrderNumber, productType: form.type },
+      }).catch((e) => console.warn("Push notify failed:", e));
       setOrderNumber(newOrderNumber);
 
       // Send confirmation email via EmailJS (non-blocking)
