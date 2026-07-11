@@ -23,7 +23,7 @@ A premium bakery website built for Grain Crumbs, showcasing handcrafted cookies,
 
 ## Live Website
 
-https://graincrumbs.vercel.app
+https://graincrumbs.com
 
 ## Installation
 
