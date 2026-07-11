@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Phone, MapPin, Mail, Youtube } from "lucide-react";
+import { Instagram, Phone, MapPin, Mail, Youtube, ShieldCheck } from "lucide-react";
 const logo = "/assets/grain-crumbs/logo-premium.png";
+// Drop the official FSSAI logo file (provided by the client / downloaded from
+// https://fssai.gov.in) into your assets folder and point this path at it.
+// Until then, the ShieldCheck icon below is used as a stand-in.
+const fssaiLogo = "/assets/grain-crumbs/fssai-logo.png";
+const FSSAI_REG_ID = "21526079004122";
 
 export function SiteFooter() {
   return (
@@ -63,6 +68,31 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
+
+      {/* FSSAI Approved strip */}
+      <div className="border-t border-border/70 bg-[color:var(--cream-dark)]">
+        <div className="container-prose flex items-center justify-center gap-3 py-5">
+          <img
+            src={fssaiLogo}
+            alt="FSSAI"
+            width={32}
+            height={32}
+            className="h-8 w-8 object-contain"
+            onError={(e) => {
+              // Falls back to a generic shield icon if fssai-logo.png hasn't been added yet
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
+          <div className="flex items-center gap-2 text-sm">
+            <ShieldCheck className="h-4 w-4 text-[color:var(--gold)]" />
+            <span className="font-medium text-foreground">FSSAI Approved</span>
+            <span className="text-muted-foreground">
+              · Lic./Reg. No. {FSSAI_REG_ID}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="border-t border-border/70">
         <div className="container-prose flex flex-col items-center justify-between gap-3 py-6 text-xs text-muted-foreground md:flex-row">
           <p>© 2026 Grain Crumbs. All Rights Reserved.</p>
