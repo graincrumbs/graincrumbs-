@@ -61,6 +61,23 @@ const brandingOptions = ["Logo Sticker", "Custom Message Card", "Custom Packagin
 
 const occasions = ["Birthday", "Anniversary", "Corporate Event", "Gift", "Other"];
 
+// Columns that actually exist on public.orders (keep in sync with supabase/migrations/*).
+// insertOrder() below strips anything not in this list before hitting Supabase,
+// so a stray form field (like pincode) can never again cause a PGRST204 schema-cache error.
+const ORDERS_TABLE_COLUMNS = [
+  "name", "phone", "email", "product_type", "flavour", "weight",
+  "cake_message", "theme", "delivery", "address", "occasion",
+  "date_required", "notes", "image_url",
+] as const;
+
+function buildOrderPayload(payload: Record<string, unknown>) {
+  const clean: Record<string, unknown> = {};
+  for (const key of ORDERS_TABLE_COLUMNS) {
+    if (key in payload) clean[key] = payload[key];
+  }
+  return clean;
+}
+
 function OrderPage() {
   const { from } = Route.useSearch();
   const { items: cartItems, subtotal: cartSubtotal, clearCart } = useCart();
@@ -227,7 +244,10 @@ function OrderPage() {
             : form.browniePieces
           : hasCart ? cartSummary : null;
 
-      const { data, error } = await supabase.from("orders").insert({
+      // buildOrderPayload strips any key that isn't an actual orders column —
+      // this is what prevents a stray field (e.g. pincode) from ever reaching
+      // Supabase and triggering a PGRST204 "column not found in schema cache" error.
+      const orderPayload = buildOrderPayload({
         name: form.name,
         phone: form.phone,
         email,
@@ -244,7 +264,13 @@ function OrderPage() {
         date_required: form.date || null,
         notes: cartNotes,
         image_url: imageUrl,
-      }).select("order_number").single();
+      });
+
+      const { data, error } = await supabase
+        .from("orders")
+        .insert(orderPayload)
+        .select("order_number")
+        .single();
 
       if (error) throw error;
 
