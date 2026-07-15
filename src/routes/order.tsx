@@ -202,6 +202,11 @@ function OrderPage() {
       return;
     }
 
+    if (form.delivery === "Delivery" && form.pincode.trim().length !== 6) {
+      alert("Please enter a valid 6-digit pincode for delivery.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       // Upload reference image if provided
@@ -306,7 +311,12 @@ function OrderPage() {
       setSubmitted(true);
     } catch (err) {
       console.error("Order submission error:", err);
-      const msg = err instanceof Error ? err.message : String(err);
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message: unknown }).message)
+            : String(err);
       alert(`Could not submit: ${msg}. Please try WhatsApp instead.`);
     } finally {
       setSubmitting(false);
@@ -630,6 +640,7 @@ function OrderPage() {
                     </Field>
                     <Field label="Delivery Pincode" full>
                       <input
+                        required
                         inputMode="numeric"
                         pattern="\d{6}"
                         maxLength={6}
