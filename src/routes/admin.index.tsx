@@ -22,6 +22,7 @@ type Order = {
   theme: string | null;
   delivery: string;
   address: string | null;
+  pincode: string | null;
   occasion: string | null;
   date_required: string | null;
   notes: string | null;
@@ -381,6 +382,7 @@ function AdminDashboard() {
               <Detail label="Cake message" value={active.cake_message} full />
               <Detail label="Theme" value={active.theme} full />
               <Detail label="Address" value={active.address} full />
+              <Detail label="Pincode" value={active.pincode} />
               <Detail label="Notes" value={active.notes} full />
               <Detail label="Submitted" value={new Date(active.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} full />
             </dl>
