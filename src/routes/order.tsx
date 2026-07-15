@@ -5,9 +5,6 @@ import { Reveal } from "@/components/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { estimateDelivery } from "@/lib/delivery-estimate";
 import { useCart, formatCartSummary } from "@/lib/cart-context";
-import { CakeMessageWriter } from "@/components/ai/CakeMessageWriter";
-import { GiftRecommender } from "@/components/ai/GiftRecommender";
-import { WhatsAppAiAssistant } from "@/components/ai/WhatsAppAiAssistant";
 
 const EMAILJS_SERVICE_ID = "service_o3pbjwb";
 const EMAILJS_TEMPLATE_ID = "template_4ci5adc";
@@ -63,6 +60,23 @@ const corporateBoxOptions = ["10–25", "25–50", "50–100", "100+"];
 const brandingOptions = ["Logo Sticker", "Custom Message Card", "Custom Packaging", "Employee Names"];
 
 const occasions = ["Birthday", "Anniversary", "Corporate Event", "Gift", "Other"];
+
+// Columns that actually exist on public.orders (keep in sync with supabase/migrations/*).
+// insertOrder() below strips anything not in this list before hitting Supabase,
+// so a stray form field (like pincode) can never again cause a PGRST204 schema-cache error.
+const ORDERS_TABLE_COLUMNS = [
+  "name", "phone", "email", "product_type", "flavour", "weight",
+  "cake_message", "theme", "delivery", "address", "occasion",
+  "date_required", "notes", "image_url",
+] as const;
+
+function buildOrderPayload(payload: Record<string, unknown>) {
+  const clean: Record<string, unknown> = {};
+  for (const key of ORDERS_TABLE_COLUMNS) {
+    if (key in payload) clean[key] = payload[key];
+  }
+  return clean;
+}
 
 function OrderPage() {
   const { from } = Route.useSearch();
@@ -172,7 +186,6 @@ function OrderPage() {
       form.type === "Bulk / Corporate Order" && form.corporateNotes && `Additional Requirements: ${form.corporateNotes}`,
       `Delivery: ${form.delivery}`,
       form.delivery === "Delivery" && form.address && `Address: ${form.address}`,
-      form.delivery === "Delivery" && form.pincode && `Pincode: ${form.pincode}`,
       form.type !== "Bulk / Corporate Order" && `Occasion: ${form.occasion}`,
       form.date && `Date required: ${form.date}`,
       form.notes && `Notes: ${form.notes}`,
@@ -187,17 +200,6 @@ function OrderPage() {
     if (!email) {
       alert("Please enter your email address so we can send your confirmation email.");
       return;
-    }
-
-    if (form.delivery === "Delivery") {
-      if (!form.address.trim()) {
-        alert("Please enter your delivery address.");
-        return;
-      }
-      if (!/^\d{6}$/.test(form.pincode)) {
-        alert("Please enter a valid 6-digit delivery pincode.");
-        return;
-      }
     }
 
     setSubmitting(true);
@@ -242,7 +244,10 @@ function OrderPage() {
             : form.browniePieces
           : hasCart ? cartSummary : null;
 
-      const { data, error } = await supabase.from("orders").insert({
+      // buildOrderPayload strips any key that isn't an actual orders column —
+      // this is what prevents a stray field (e.g. pincode) from ever reaching
+      // Supabase and triggering a PGRST204 "column not found in schema cache" error.
+      const orderPayload = buildOrderPayload({
         name: form.name,
         phone: form.phone,
         email,
@@ -255,19 +260,21 @@ function OrderPage() {
           : form.type === "Gift Box" ? form.giftTheme : null,
         delivery: form.delivery,
         address: form.delivery === "Delivery" ? form.address : null,
-        pincode: form.delivery === "Delivery" ? form.pincode : null,
         occasion: form.type !== "Bulk / Corporate Order" ? form.occasion : null,
         date_required: form.date || null,
         notes: cartNotes,
         image_url: imageUrl,
-      }).select("order_number").single();
+      });
+
+      const { data, error } = await supabase
+        .from("orders")
+        .insert(orderPayload)
+        .select("order_number")
+        .single();
 
       if (error) throw error;
 
       const newOrderNumber = data?.order_number ?? null;
-      supabase.functions.invoke("notify-admin-order", {
-        body: { orderNumber: newOrderNumber, productType: form.type },
-      }).catch((e) => console.warn("Push notify failed:", e));
       setOrderNumber(newOrderNumber);
 
       // Send confirmation email via EmailJS (non-blocking)
@@ -536,27 +543,9 @@ function OrderPage() {
                         {giftBudgetOptions.map((o) => <option key={o}>{o}</option>)}
                       </select>
                     </Field>
-                    <div className="sm:col-span-2">
-                      <GiftRecommender
-                        compact
-                        onApply={({ occasion, budget, quantity }) => {
-                          const themeMap: Record<string, string> = {
-                            Birthday: "Birthday",
-                            Anniversary: "Anniversary",
-                            "Thank You": "Thank You",
-                            Festival: "Festival",
-                            Corporate: "Other",
-                            "Baby Announcement": "Baby Announcement",
-                            Other: "Other",
-                          };
-                          update("giftTheme", themeMap[occasion] ?? "Other");
-                          if (budget) update("giftBudget", budget);
-                          if (quantity === "1 box") update("giftQty", "1");
-                          else if (quantity === "2–5 boxes") update("giftQty", "2–5");
-                          else if (quantity === "6–10 boxes") update("giftQty", "6–10");
-                          else if (quantity === "10+ boxes") update("giftQty", "10+");
-                        }}
-                      />
+                    <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 p-5 text-sm text-muted-foreground">
+                      <p>Every gift box is handcrafted and customized based on your requirements.</p>
+                      <p className="mt-1">Submit your enquiry and we'll get back to you with a personalized quotation within 24 hours.</p>
                     </div>
                   </>
                 )}
@@ -609,11 +598,6 @@ function OrderPage() {
                 <Fieldset title="Customisation" step="03">
                   <Field label="Cake Message" full>
                     <input value={form.message} onChange={(e) => update("message", e.target.value)} className={inputCls} placeholder="e.g. Happy Birthday, Aanya!" />
-                    <CakeMessageWriter
-                      occasion={form.occasion}
-                      value={form.message}
-                      onSelect={(message) => update("message", message)}
-                    />
                   </Field>
                   <Field label="Theme Request">
                     <input value={form.theme} onChange={(e) => update("theme", e.target.value)} className={inputCls} placeholder="Floral, minimal, gold accents…" />
@@ -641,15 +625,13 @@ function OrderPage() {
                 </Field>
                 {form.delivery === "Delivery" && (
                   <>
-                    <Field label="Delivery Address" required full>
+                    <Field label="Delivery Address" full>
                       <textarea required value={form.address} onChange={(e) => update("address", e.target.value)} className={`${inputCls} min-h-24`} placeholder="Full address, landmark, pincode" />
                     </Field>
-                    <Field label="Delivery Pincode" required full>
+                    <Field label="Delivery Pincode" full>
                       <input
-                        required
                         inputMode="numeric"
                         pattern="\d{6}"
-                        title="Please enter a valid 6-digit pincode"
                         maxLength={6}
                         value={form.pincode}
                         onChange={(e) => update("pincode", e.target.value.replace(/\D/g, "").slice(0, 6))}
@@ -719,18 +701,15 @@ function OrderPage() {
                   ))}
                 </ol>
               </div>
-              <WhatsAppAiAssistant
-                compact
-                defaultContext={{
-                  name: form.name,
-                  phone: form.phone,
-                  product: form.type,
-                  flavour: form.flavour,
-                  delivery: form.delivery,
-                  date: form.date,
-                  notes: form.notes,
-                }}
-              />
+              <div className="rounded-2xl border border-border bg-[color:var(--cream-dark)]/40 p-7">
+                <p className="font-display text-xl">Need it sooner?</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  WhatsApp is the fastest way to reach us — we usually reply within an hour.
+                </p>
+                <a href="https://wa.me/918208257574" target="_blank" rel="noreferrer" className="btn-gold mt-5">
+                  WhatsApp Us
+                </a>
+              </div>
             </aside>
           </Reveal>
         </div>
