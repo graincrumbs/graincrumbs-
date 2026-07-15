@@ -66,7 +66,7 @@ const occasions = ["Birthday", "Anniversary", "Corporate Event", "Gift", "Other"
 // so a stray form field (like pincode) can never again cause a PGRST204 schema-cache error.
 const ORDERS_TABLE_COLUMNS = [
   "name", "phone", "email", "product_type", "flavour", "weight",
-  "cake_message", "theme", "delivery", "address", "occasion",
+  "cake_message", "theme", "delivery", "address", "pincode", "occasion",
   "date_required", "notes", "image_url",
 ] as const;
 
@@ -265,6 +265,7 @@ function OrderPage() {
           : form.type === "Gift Box" ? form.giftTheme : null,
         delivery: form.delivery,
         address: form.delivery === "Delivery" ? form.address : null,
+        pincode: form.delivery === "Delivery" ? form.pincode : null,
         occasion: form.type !== "Bulk / Corporate Order" ? form.occasion : null,
         date_required: form.date || null,
         notes: cartNotes,
