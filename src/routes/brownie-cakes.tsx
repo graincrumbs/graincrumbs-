@@ -34,6 +34,17 @@ const occasions = [
   { title: "Custom Cakes",    tag: "Butterfly-detailed, signature.",       img: "/assets/grain-crumbs/occasions/custom-cakes.png"     },
 ];
 
+// Show a strikethrough only when there's a real discount set for that size.
+function hasDiscount(oldPrice: number, price: number) {
+  return !!oldPrice && oldPrice > price;
+}
+
+// Items like "Assorted Box" are sold at one flat price, not per weight —
+// detected when all 4 size prices are identical, so the menu shows a single price.
+function isFixedPrice(prices: number[]) {
+  return prices.every((p) => p === prices[0]);
+}
+
 const heroImages = [
   "/assets/grain-crumbs/cake-chocolate-walnut.png",
   "/assets/grain-crumbs/cake-cappuccino-walnut.png",
@@ -119,19 +130,23 @@ function Page() {
                     {r.name}
                   </div>
                 </div>
-                {prices.map((p, idx) => {
-                  const hasDiscount = !!olds[idx] && olds[idx] > p;
-                  return (
+                {isFixedPrice(prices) ? (
+                  <div className="col-span-4 text-center">
+                    {hasDiscount(olds[0], prices[0]) && (
+                      <div className="text-[11px] text-muted-foreground line-through">₹{olds[0]}</div>
+                    )}
+                    <div className="font-display text-xl text-[color:var(--chocolate)]">₹{prices[0]}</div>
+                  </div>
+                ) : (
+                  prices.map((p, idx) => (
                     <div key={idx} className="text-center">
-                      {hasDiscount ? (
+                      {hasDiscount(olds[idx], p) && (
                         <div className="text-[11px] text-muted-foreground line-through">₹{olds[idx]}</div>
-                      ) : (
-                        <div className="text-[11px] invisible">₹0</div>
                       )}
                       <div className="font-display text-xl text-[color:var(--chocolate)]">₹{p}</div>
                     </div>
-                  );
-                })}
+                  ))
+                )}
               </div>
               );
             })}
@@ -169,24 +184,32 @@ function Page() {
                       </span>
                     </div>
 
-                    {/* 4 price columns */}
-                    {prices.map((p, idx) => {
-                      const hasDiscount = !!olds[idx] && olds[idx] > p;
-                      return (
+                    {/* 4 price columns (or a single merged price for fixed-price items) */}
+                    {isFixedPrice(prices) ? (
+                      <div className="col-span-4 flex flex-col items-center gap-0.5 border-l border-border/40 py-1">
+                        {hasDiscount(olds[0], prices[0]) && (
+                          <span className="text-[9px] leading-none text-muted-foreground line-through">
+                            ₹{olds[0]}
+                          </span>
+                        )}
+                        <span className="font-display text-[13px] leading-tight text-[color:var(--chocolate)]">
+                          ₹{prices[0]}
+                        </span>
+                      </div>
+                    ) : (
+                      prices.map((p, idx) => (
                         <div key={idx} className="flex flex-col items-center gap-0.5 border-l border-border/40 py-1">
-                          {hasDiscount ? (
+                          {hasDiscount(olds[idx], p) && (
                             <span className="text-[9px] leading-none text-muted-foreground line-through">
                               ₹{olds[idx]}
                             </span>
-                          ) : (
-                            <span className="text-[9px] leading-none invisible">₹0</span>
                           )}
                           <span className="font-display text-[13px] leading-tight text-[color:var(--chocolate)]">
                             ₹{p}
                           </span>
                         </div>
-                      );
-                    })}
+                      ))
+                    )}
                   </div>
                 </div>
                 );
