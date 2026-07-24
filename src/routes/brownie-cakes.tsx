@@ -119,12 +119,19 @@ function Page() {
                     {r.name}
                   </div>
                 </div>
-                {prices.map((p, idx) => (
-                  <div key={idx} className="text-center">
-                    <div className="text-[11px] text-muted-foreground line-through">₹{olds[idx]}</div>
-                    <div className="font-display text-xl text-[color:var(--chocolate)]">₹{p}</div>
-                  </div>
-                ))}
+                {prices.map((p, idx) => {
+                  const hasDiscount = !!olds[idx] && olds[idx] > p;
+                  return (
+                    <div key={idx} className="text-center">
+                      {hasDiscount ? (
+                        <div className="text-[11px] text-muted-foreground line-through">₹{olds[idx]}</div>
+                      ) : (
+                        <div className="text-[11px] invisible">₹0</div>
+                      )}
+                      <div className="font-display text-xl text-[color:var(--chocolate)]">₹{p}</div>
+                    </div>
+                  );
+                })}
               </div>
               );
             })}
@@ -163,16 +170,23 @@ function Page() {
                     </div>
 
                     {/* 4 price columns */}
-                    {prices.map((p, idx) => (
-                      <div key={idx} className="flex flex-col items-center gap-0.5 border-l border-border/40 py-1">
-                        <span className="text-[9px] leading-none text-muted-foreground line-through">
-                          ₹{olds[idx]}
-                        </span>
-                        <span className="font-display text-[13px] leading-tight text-[color:var(--chocolate)]">
-                          ₹{p}
-                        </span>
-                      </div>
-                    ))}
+                    {prices.map((p, idx) => {
+                      const hasDiscount = !!olds[idx] && olds[idx] > p;
+                      return (
+                        <div key={idx} className="flex flex-col items-center gap-0.5 border-l border-border/40 py-1">
+                          {hasDiscount ? (
+                            <span className="text-[9px] leading-none text-muted-foreground line-through">
+                              ₹{olds[idx]}
+                            </span>
+                          ) : (
+                            <span className="text-[9px] leading-none invisible">₹0</span>
+                          )}
+                          <span className="font-display text-[13px] leading-tight text-[color:var(--chocolate)]">
+                            ₹{p}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 );
