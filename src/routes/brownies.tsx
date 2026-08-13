@@ -27,14 +27,32 @@ function BrowniesPage() {
 
   // Track premium topping selection independently per flavour slug
   const [premiumToppings, setPremiumToppings] = useState<Record<string, boolean>>({});
+  // Track vegan / monk fruit sweetener add-ons independently per flavour slug
+  const [veganOption, setVeganOption] = useState<Record<string, boolean>>({});
+  const [monkFruitOption, setMonkFruitOption] = useState<Record<string, boolean>>({});
+
+  const ADDON_PRICE = 99;
 
   const handleAddToCart = (f: Product) => {
     const hasPremium = premiumToppings[f.slug] ?? false;
+    const hasVegan = veganOption[f.slug] ?? false;
+    const hasMonkFruit = monkFruitOption[f.slug] ?? false;
     const premiumLabel = f.premiumToppingLabel;
+
+    const extraLabels: string[] = [];
+    if (hasPremium) extraLabels.push(premiumLabel);
+    if (hasVegan) extraLabels.push("Vegan");
+    if (hasMonkFruit) extraLabels.push("100% Monk Fruit Sweetener");
+
+    const extraPrice =
+      (hasPremium ? f.premiumToppingPrice : 0) +
+      (hasVegan ? ADDON_PRICE : 0) +
+      (hasMonkFruit ? ADDON_PRICE : 0);
+
     addItem({
       slug: f.slug,
-      name: hasPremium ? `${f.name} + ${premiumLabel}` : f.name,
-      price: hasPremium ? f.price + f.premiumToppingPrice : f.price,
+      name: extraLabels.length ? `${f.name} + ${extraLabels.join(" + ")}` : f.name,
+      price: f.price + extraPrice,
       image: f.image,
     });
     toast.success(`${f.name} added to cart`, {
@@ -91,7 +109,14 @@ function BrowniesPage() {
           <div className="mt-14 grid gap-10">
             {flavours.map((f, i) => {
               const hasPremium = premiumToppings[f.slug] ?? false;
-              const displayPrice = hasPremium ? f.price + f.premiumToppingPrice : f.price;
+              const hasVegan = veganOption[f.slug] ?? false;
+              const hasMonkFruit = monkFruitOption[f.slug] ?? false;
+              const extraPrice =
+                (hasPremium ? f.premiumToppingPrice : 0) +
+                (hasVegan ? ADDON_PRICE : 0) +
+                (hasMonkFruit ? ADDON_PRICE : 0);
+              const displayPrice = f.price + extraPrice;
+              const hasAnyAddon = hasPremium || hasVegan || hasMonkFruit;
 
               return (
                 <Reveal key={f.slug} delay={i * 50}>
@@ -113,7 +138,7 @@ function BrowniesPage() {
                         <p className="italic text-[color:var(--gold)]">{f.tagline}</p>
                         <span className="font-display text-2xl text-[color:var(--chocolate)]">
                           ₹{displayPrice}
-                          {hasPremium && (
+                          {hasAnyAddon && (
                             <span className="ml-2 text-base font-normal text-muted-foreground line-through">₹{f.price}</span>
                           )}
                         </span>
@@ -141,6 +166,40 @@ function BrowniesPage() {
                           <span className="font-medium text-foreground">{f.premiumToppingLabel}</span>
                           <span className="ml-2 font-semibold text-[color:var(--gold)]">+₹{f.premiumToppingPrice}</span>
                           <span className="mt-0.5 block text-xs text-muted-foreground">Available at an additional ₹{f.premiumToppingPrice} per order</span>
+                        </span>
+                      </label>
+
+                      {/* Vegan option add-on */}
+                      <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-4 py-3 text-sm transition hover:border-[color:var(--gold)]/70 hover:bg-[color:var(--cream-dark)]/70">
+                        <input
+                          type="checkbox"
+                          checked={hasVegan}
+                          onChange={(e) =>
+                            setVeganOption((prev) => ({ ...prev, [f.slug]: e.target.checked }))
+                          }
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-[color:var(--chocolate-dark)]"
+                        />
+                        <span>
+                          <span className="font-medium text-foreground">Vegan option</span>
+                          <span className="ml-2 font-semibold text-[color:var(--gold)]">+₹{ADDON_PRICE}</span>
+                          <span className="mt-0.5 block text-xs text-muted-foreground">Vegan option available for an additional ₹{ADDON_PRICE}</span>
+                        </span>
+                      </label>
+
+                      {/* 100% Monk Fruit sweetener option add-on */}
+                      <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-4 py-3 text-sm transition hover:border-[color:var(--gold)]/70 hover:bg-[color:var(--cream-dark)]/70">
+                        <input
+                          type="checkbox"
+                          checked={hasMonkFruit}
+                          onChange={(e) =>
+                            setMonkFruitOption((prev) => ({ ...prev, [f.slug]: e.target.checked }))
+                          }
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-[color:var(--chocolate-dark)]"
+                        />
+                        <span>
+                          <span className="font-medium text-foreground">100% Monk Fruit sweetener option</span>
+                          <span className="ml-2 font-semibold text-[color:var(--gold)]">+₹{ADDON_PRICE}</span>
+                          <span className="mt-0.5 block text-xs text-muted-foreground">100% Monk Fruit sweetener option available for an additional ₹{ADDON_PRICE}</span>
                         </span>
                       </label>
 
