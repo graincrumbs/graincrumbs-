@@ -221,6 +221,13 @@ function Page() {
             Custom messages, themed finishes &amp; occasion detailing available on request.
           </Reveal>
 
+          <Reveal className="mx-auto mt-4 max-w-xl text-center text-sm text-muted-foreground">
+            <ul className="space-y-1">
+              <li>Vegan option available for an additional ₹99.</li>
+              <li>100% Monk Fruit sweetener option available for an additional ₹99.</li>
+            </ul>
+          </Reveal>
+
           <Reveal className="mt-6 flex flex-wrap justify-center gap-3">
             <Link to="/order" className="btn-primary">Order Now</Link>
             <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline">WhatsApp Enquiry</a>
