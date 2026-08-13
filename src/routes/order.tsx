@@ -91,6 +91,11 @@ function OrderPage() {
   const [referenceImage, setReferenceImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  // Vegan / Monk Fruit sweetener add-ons (Brownies manual flow + Brownie Cake)
+  const [veganAddon, setVeganAddon] = useState(false);
+  const [monkFruitAddon, setMonkFruitAddon] = useState(false);
+  const ADDON_PRICE = 99;
+
   const [form, setForm] = useState({
     name: "", phone: "", email: "",
     type: "Brownies" as ProductType,
@@ -175,6 +180,8 @@ function OrderPage() {
       form.type === "Brownie Cake" && `Weight: ${form.weight}`,
       form.type === "Brownie Cake" && form.message && `Cake message: ${form.message}`,
       form.type === "Brownie Cake" && form.theme && `Theme: ${form.theme}`,
+      (form.type === "Brownies" || form.type === "Brownie Cake") && veganAddon && `Add-on: Vegan option (+₹${ADDON_PRICE})`,
+      (form.type === "Brownies" || form.type === "Brownie Cake") && monkFruitAddon && `Add-on: 100% Monk Fruit sweetener option (+₹${ADDON_PRICE})`,
       form.type === "Gift Box" && `Gift Theme: ${form.giftTheme}`,
       form.type === "Gift Box" && `Number of Boxes: ${form.giftQty}`,
       form.type === "Gift Box" && form.giftBudget && `Budget per Box: ${form.giftBudget}`,
@@ -191,7 +198,7 @@ function OrderPage() {
       form.notes && `Notes: ${form.notes}`,
     ].filter(Boolean).join("\n");
     return encodeURIComponent(lines);
-  }, [form, hasCart, cartSummary, cartSubtotal, isAssortedBox, assortedBoxTotal]);
+  }, [form, hasCart, cartSummary, cartSubtotal, isAssortedBox, assortedBoxTotal, veganAddon, monkFruitAddon]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,9 +235,16 @@ function OrderPage() {
         }
       }
 
+      const addonNotes = [
+        veganAddon && `Vegan option requested (+₹${ADDON_PRICE})`,
+        monkFruitAddon && `100% Monk Fruit sweetener option requested (+₹${ADDON_PRICE})`,
+      ].filter(Boolean).join("; ");
+
+      const baseNotes = [form.notes, addonNotes].filter(Boolean).join("\n");
+
       const cartNotes = hasCart && form.type === "Brownies"
-        ? [form.notes, `Cart: ${cartSummary} (Est. ₹${cartSubtotal})`].filter(Boolean).join("\n")
-        : form.notes || null;
+        ? [baseNotes, `Cart: ${cartSummary} (Est. ₹${cartSubtotal})`].filter(Boolean).join("\n")
+        : baseNotes || null;
 
       // For assorted box: flavour = "Assorted Box", weight = number of boxes
       const flavourValue = form.type === "Brownies" || form.type === "Brownie Cake"
@@ -518,6 +532,29 @@ function OrderPage() {
                         />
                       </Field>
                     )}
+                    {/* Vegan / Monk Fruit sweetener add-ons */}
+                    <Field label="Add-ons (Optional)" full>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={veganAddon}
+                            onChange={(e) => setVeganAddon(e.target.checked)}
+                            className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                          />
+                          Vegan option (+₹{ADDON_PRICE})
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={monkFruitAddon}
+                            onChange={(e) => setMonkFruitAddon(e.target.checked)}
+                            className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                          />
+                          100% Monk Fruit sweetener option (+₹{ADDON_PRICE})
+                        </label>
+                      </div>
+                    </Field>
                   </>
                 )}
 
@@ -531,6 +568,28 @@ function OrderPage() {
                     </Field>
                     <Field label="Weight / Size">
                       <ChipGroup options={cakeWeights} value={form.weight} onChange={(v) => update("weight", v)} />
+                    </Field>
+                    <Field label="Add-ons (Optional)" full>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={veganAddon}
+                            onChange={(e) => setVeganAddon(e.target.checked)}
+                            className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                          />
+                          Vegan option (+₹{ADDON_PRICE})
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={monkFruitAddon}
+                            onChange={(e) => setMonkFruitAddon(e.target.checked)}
+                            className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                          />
+                          100% Monk Fruit sweetener option (+₹{ADDON_PRICE})
+                        </label>
+                      </div>
                     </Field>
                   </>
                 )}
