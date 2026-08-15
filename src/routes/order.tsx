@@ -5,6 +5,7 @@ import { Reveal } from "@/components/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { estimateDelivery } from "@/lib/delivery-estimate";
 import { useCart, formatCartSummary } from "@/lib/cart-context";
+import { tubFlavours } from "@/lib/tub-flavours";
 
 const EMAILJS_SERVICE_ID = "service_o3pbjwb";
 const EMAILJS_TEMPLATE_ID = "template_4ci5adc";
@@ -25,10 +26,10 @@ export const Route = createFileRoute("/order")({
   component: OrderPage,
 });
 
-type ProductType = "Brownies" | "Brownie Cake" | "Gift Box" | "Bulk / Corporate Order";
+type ProductType = "Brownies" | "Brownie Tub" | "Brownie Cake" | "Gift Box" | "Bulk / Corporate Order";
 type Delivery = "Pickup" | "Delivery";
 
-const productTypes: ProductType[] = ["Brownies", "Brownie Cake", "Gift Box", "Bulk / Corporate Order"];
+const productTypes: ProductType[] = ["Brownies", "Brownie Tub", "Brownie Cake", "Gift Box", "Bulk / Corporate Order"];
 
 // Regular flavours + Assorted Box at the bottom
 const flavoursList = [
@@ -41,6 +42,17 @@ const flavoursWithAssorted = [...flavoursList, ASSORTED_BOX];
 const ASSORTED_BOX_PRICE = 789;
 
 const browniePieces = ["6 pieces", "12 pieces", "18 pieces", "24 pieces"];
+
+// Brownie Tubs — 250g tub, 3 pieces each, six signature flavours
+const tubFlavoursList = tubFlavours.map((t) => t.name);
+const tubQty = ["1 tub", "2 tubs", "3 tubs", "4 tubs", "5 tubs", "6+ tubs"];
+function parseTubCount(qty: string): number | null {
+  const match = qty.match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+function tubPriceFor(name: string): number {
+  return tubFlavours.find((t) => t.name === name)?.price ?? 0;
+}
 // For assorted box — quantity means number of boxes (each box = 6 pieces, all 6 flavours)
 const assortedBoxQty = ["1 box", "2 boxes", "3 boxes", "4 boxes", "5 boxes", "6+ boxes"];
 
@@ -102,6 +114,8 @@ function OrderPage() {
     flavour: flavoursList[0],
     browniePieces: browniePieces[0],
     assortedQty: assortedBoxQty[0],
+    tubFlavour: tubFlavoursList[0],
+    tubQty: tubQty[0],
     weight: cakeWeights[1],
     message: "", theme: "",
     delivery: "Pickup" as Delivery,
@@ -130,6 +144,11 @@ function OrderPage() {
   const assortedBoxTotal = assortedBoxCount !== null
     ? assortedBoxCount * ASSORTED_BOX_PRICE
     : null;
+
+  // Brownie Tub total
+  const tubCount = parseTubCount(form.tubQty);
+  const tubUnitPrice = tubPriceFor(form.tubFlavour);
+  const tubTotal = tubCount !== null ? tubCount * tubUnitPrice : null;
 
   const estimate = estimateDelivery(form.pincode);
 
@@ -176,6 +195,9 @@ function OrderPage() {
       !hasCart && form.type === "Brownies" && isAssortedBox && `Selection: Premium Assorted Box (all 6 flavours, 6 pieces per box)`,
       !hasCart && form.type === "Brownies" && isAssortedBox && `Number of Boxes: ${form.assortedQty}`,
       !hasCart && form.type === "Brownies" && isAssortedBox && assortedBoxTotal !== null && `Estimated Total: ₹${assortedBoxTotal}`,
+      form.type === "Brownie Tub" && `Tub Flavour: ${form.tubFlavour}`,
+      form.type === "Brownie Tub" && `Quantity: ${form.tubQty}`,
+      form.type === "Brownie Tub" && tubTotal !== null && `Estimated Total: ₹${tubTotal}`,
       form.type === "Brownie Cake" && `Flavour: ${form.flavour}`,
       form.type === "Brownie Cake" && `Weight: ${form.weight}`,
       form.type === "Brownie Cake" && form.message && `Cake message: ${form.message}`,
@@ -198,7 +220,7 @@ function OrderPage() {
       form.notes && `Notes: ${form.notes}`,
     ].filter(Boolean).join("\n");
     return encodeURIComponent(lines);
-  }, [form, hasCart, cartSummary, cartSubtotal, isAssortedBox, assortedBoxTotal, veganAddon, monkFruitAddon]);
+  }, [form, hasCart, cartSummary, cartSubtotal, isAssortedBox, assortedBoxTotal, veganAddon, monkFruitAddon, tubTotal]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -244,7 +266,9 @@ function OrderPage() {
 
       const cartNotes = hasCart && form.type === "Brownies"
         ? [baseNotes, `Cart: ${cartSummary} (Est. ₹${cartSubtotal})`].filter(Boolean).join("\n")
-        : baseNotes || null;
+        : form.type === "Brownie Tub" && tubTotal !== null
+          ? [baseNotes, `Estimated Total: ₹${tubTotal}`].filter(Boolean).join("\n")
+          : baseNotes || null;
 
       // For assorted box: flavour = "Assorted Box", weight = number of boxes
       const flavourValue = form.type === "Brownies" || form.type === "Brownie Cake"
@@ -253,7 +277,9 @@ function OrderPage() {
           : isAssortedBox
             ? "Premium Assorted Box (all 6 flavours, 6 pieces per box)"
             : form.flavour
-        : null;
+        : form.type === "Brownie Tub"
+          ? form.tubFlavour
+          : null;
 
       const weightValue = form.type === "Brownie Cake"
         ? form.weight
@@ -261,7 +287,9 @@ function OrderPage() {
           ? isAssortedBox
             ? form.assortedQty
             : form.browniePieces
-          : hasCart ? cartSummary : null;
+          : form.type === "Brownie Tub"
+            ? form.tubQty
+            : hasCart ? cartSummary : null;
 
       // buildOrderPayload strips any key that isn't an actual orders column —
       // this is what prevents a stray field (e.g. pincode) from ever reaching
@@ -390,6 +418,7 @@ function OrderPage() {
   const isCorporate = form.type === "Bulk / Corporate Order";
   const isGiftBox = form.type === "Gift Box";
   const isBrownies = form.type === "Brownies";
+  const isTub = form.type === "Brownie Tub";
   const isBrownieCake = form.type === "Brownie Cake";
 
   return (
@@ -554,6 +583,53 @@ function OrderPage() {
                           100% Monk Fruit sweetener option (+₹{ADDON_PRICE})
                         </label>
                       </div>
+                    </Field>
+                  </>
+                )}
+
+                {/* BROWNIE TUB */}
+                {isTub && (
+                  <>
+                    <Field label="Tub Flavour" full>
+                      <select
+                        value={form.tubFlavour}
+                        onChange={(e) => update("tubFlavour", e.target.value)}
+                        className={inputCls}
+                      >
+                        {tubFlavoursList.map((f) => <option key={f}>{f}</option>)}
+                      </select>
+                    </Field>
+
+                    <div className="sm:col-span-2 flex items-start gap-2 rounded-xl border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/50 px-4 py-3 text-sm">
+                      <span className="mt-0.5 shrink-0 font-semibold text-[color:var(--gold)]">*</span>
+                      <p className="text-muted-foreground">
+                        Every tub is <span className="font-medium text-foreground">250g</span> and contains{" "}
+                        <span className="font-medium text-foreground">3 brownie pieces</span>.
+                      </p>
+                    </div>
+
+                    <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
+                      <div className="flex items-end justify-between flex-wrap gap-2">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Price per Tub</p>
+                          <p className="mt-1 font-display text-3xl text-[color:var(--chocolate-dark)]">₹{tubUnitPrice}</p>
+                        </div>
+                        {tubTotal !== null && (
+                          <div className="text-right">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                              {form.tubQty} × ₹{tubUnitPrice}
+                            </p>
+                            <p className="mt-1 font-display text-3xl text-[color:var(--chocolate)]">₹{tubTotal}</p>
+                          </div>
+                        )}
+                      </div>
+                      <p className="mt-2 text-[11px] text-muted-foreground">
+                        * Estimated total. Final price confirmed on order review.
+                      </p>
+                    </div>
+
+                    <Field label="Number of Tubs">
+                      <ChipGroup options={tubQty} value={form.tubQty} onChange={(v) => update("tubQty", v)} />
                     </Field>
                   </>
                 )}
@@ -931,3 +1007,4 @@ function DeliveryEstimateCard({
     </div>
   );
 }
+Done
