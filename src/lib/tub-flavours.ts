@@ -9,7 +9,13 @@ export const tubFlavours: Flavour[] = [
     description:
       "Fudgy millet brownie pieces layered with real dried mixed berries. Bright, tart and beautiful in every bite.",
     image: "/assets/grain-crumbs/mixed-berry-jam.png",
-    notes: ["250g Tub", "3 Brownie Pieces", "Real Dried Berries"],
+    notes: [
+      "Rich Chocolate Brownie Bites",
+      "Dried Berries",
+      "Crispy Chocolate Balls",
+      "White Chocolate Dip",
+      "Dark Chocolate Dip",
+    ],
     price: 339,
   },
   {
@@ -19,7 +25,13 @@ export const tubFlavours: Flavour[] = [
     description:
       "Rich chocolate brownie pieces finished with toasty desiccated coconut for a bounty-style bite.",
     image: "/assets/grain-crumbs/coconut-bounty.png",
-    notes: ["250g Tub", "3 Brownie Pieces", "Toasted Coconut"],
+    notes: [
+      "Rich Chocolate Brownie Bites",
+      "Desiccated Coconut",
+      "Crispy Chocolate Balls",
+      "White Chocolate Dip",
+      "Dark Chocolate Dip",
+    ],
     price: 329,
   },
   {
@@ -29,7 +41,13 @@ export const tubFlavours: Flavour[] = [
     description:
       "Our signature fudgy chocolate brownie pieces, loaded with toasted crunchy walnuts.",
     image: "/assets/grain-crumbs/chocolate-walnut.png",
-    notes: ["250g Tub", "3 Brownie Pieces", "Crunchy Walnuts"],
+    notes: [
+      "Rich Chocolate Brownie Bites",
+      "Crunchy Golden Walnuts",
+      "Crispy Chocolate Balls",
+      "White Chocolate Dip",
+      "Dark Chocolate Dip",
+    ],
     price: 349,
   },
   {
@@ -39,7 +57,14 @@ export const tubFlavours: Flavour[] = [
     description:
       "Mocha-style brownie pieces loaded with crunchy walnuts and finished with a delicate dusting of coffee powder.",
     image: "/assets/grain-crumbs/cappuccino-walnut.png",
-    notes: ["250g Tub", "3 Brownie Pieces", "Coffee Dusted"],
+    notes: [
+      "Rich Chocolate Brownie Bites",
+      "Crunchy Golden Walnuts",
+      "Crispy Chocolate Balls",
+      "Coffee Dusting",
+      "White Chocolate Dip",
+      "Dark Chocolate Dip",
+    ],
     price: 359,
   },
   {
@@ -49,7 +74,14 @@ export const tubFlavours: Flavour[] = [
     description:
       "Fudgy brownie pieces loaded with crunchy golden hazelnuts and a generous hazelnut filling.",
     image: "/assets/grain-crumbs/hazelnut-spread.png",
-    notes: ["250g Tub", "3 Brownie Pieces", "Golden Hazelnuts"],
+    notes: [
+      "Rich Chocolate Brownie Bites",
+      "Hazelnuts",
+      "Crispy Chocolate Balls",
+      "Hazelnut Spread Dip",
+      "White Chocolate Dip",
+      "Dark Chocolate Dip",
+    ],
     price: 389,
   },
   {
@@ -59,7 +91,13 @@ export const tubFlavours: Flavour[] = [
     description:
       "Rich chocolate brownie pieces finished with swirls of smooth, tangy cream cheese.",
     image: "/assets/grain-crumbs/cream-cheese.png",
-    notes: ["250g Tub", "3 Brownie Pieces", "Cream Cheese"],
+    notes: [
+      "Rich Chocolate Brownie Bites",
+      "Cream Cheese Swirl",
+      "Crispy Chocolate Balls",
+      "White Chocolate Dip",
+      "Dark Chocolate Dip",
+    ],
     price: 389,
   },
 ];
