@@ -5,6 +5,7 @@ export type CookieTinVariant = Enums<"cookie_tin_variant">;
 
 export const COLLECTION_LABELS: Record<ProductCollection, string> = {
   brownies: "Brownies",
+  brownie_tubs: "Brownie Tubs",
   cookie_tins: "Cookie Tins",
   lite: "Lite",
   pro: "Pro",
