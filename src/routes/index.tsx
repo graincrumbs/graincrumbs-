@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Premium millet brownies from Pune. Made with ragi, foxtail millet, oats & buckwheat — sweetened with jaggery, finished with couverture chocolate.",
+          "Premium millet brownies. Made with ragi, foxtail millet, oats & Sorghum  — sweetened with jaggery, finished with couverture chocolate.",
       },
       { property: "og:title", content: "Grain Crumbs — Millet Brownies" },
       {
@@ -66,7 +66,7 @@ function Hero() {
         <div>
           <Reveal>
             <div className="flex flex-wrap items-center gap-3">
-              <p className="divider-gold eyebrow">Pune · Made fresh</p>
+              <p className="divider-gold eyebrow"> Made fresh</p>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-green-600/40 bg-green-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-green-700">
                 <span className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 border-green-600 text-green-600">
                   <span className="block h-1.5 w-1.5 rounded-full bg-green-600" />
@@ -84,7 +84,7 @@ function Hero() {
           <Reveal delay={240}>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-7 md:text-lg">
               Made with <em className="not-italic font-medium text-foreground">Ragi, Foxtail Millet,
-              Oats & Buckwheat.</em> Sweetened with jaggery. Crafted with premium couverture chocolate.
+              Oats & Sorghum .</em> Sweetened with jaggery. Crafted with premium couverture chocolate.
             </p>
           </Reveal>
           <Reveal delay={360}>
@@ -158,7 +158,7 @@ function Hero() {
 }
 
 const why = [
-  { icon: Wheat, title: "Millet-Based Flour Blend Only", text: "Ragi, Foxtail, Oats, Jowar, And Buckwheat." },
+  { icon: Wheat, title: "Millet-Based Flour Blend Only", text: "Ragi, Foxtail, Oats, Jowar, And Sorghum ." },
   { icon: Leaf, title: "Sweetened with Jaggery, Monkfruit, And Stevia", text: "Naturally, Never Refined." },
   { icon: Cookie, title: "Couverture Chocolate", text: "Premium, Real, Glossy." },
   { icon: Ban, title: "No Maida", text: "Ever. We Don't Compromise." },
@@ -638,7 +638,7 @@ function Gifting() {
 
 const faqs = [
   { q: "Are your brownies eggless?", a: "Yes — all our brownies are eggless, by default. We use plant-based binders and our signature millet base." },
-  { q: "Do you use maida?", a: "Never. We work only with millet flours — ragi, foxtail, oats and buckwheat." },
+  { q: "Do you use maida?", a: "Never. We work only with millet flours — ragi, foxtail, oats and ." },
   { q: "How sweet are they?", a: "Gently sweet. We use jaggery only, so the flavour is rounded and never sugary." },
   { q: "How long do they stay fresh?", a: "Storage instructions vary by product. Brownie cakes and cream cheese products must be refrigerated. Plain brownies are best within 3 days at room temperature." },
   { q: "Do you deliver across Pune?", a: "Yes. We deliver across Pune; pickup is also available from our Kharadi kitchen." },
