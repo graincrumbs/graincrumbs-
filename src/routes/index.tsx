@@ -66,7 +66,7 @@ function Hero() {
         <div>
           <Reveal>
             <div className="flex flex-wrap items-center gap-3">
-              <p className="divider-gold eyebrow"> Made fresh   </p>
+              <p className="divider-gold eyebrow"> Made fresh <br></p>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-green-600/40 bg-green-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-green-700">
                 <span className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 border-green-600 text-green-600">
                   <span className="block h-1.5 w-1.5 rounded-full bg-green-600" />
