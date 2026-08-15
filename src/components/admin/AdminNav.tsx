@@ -2,13 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { KeyRound, LogOut } from "lucide-react";
 
 type AdminNavProps = {
-  active?: "orders" | "brownies" | "cakes" | "cookie_tins" | "lite" | "pro";
+  active?: "orders" | "brownies" | "brownie_tubs" | "cakes" | "cookie_tins" | "lite" | "pro";
   onSignOut: () => void;
 };
 
 const links = [
   { key: "orders" as const, to: "/admin", label: "Orders" },
   { key: "brownies" as const, to: "/admin/products", label: "Brownies" },
+  { key: "brownie_tubs" as const, to: "/admin/brownie-tubs", label: "Brownie Tubs" },
   { key: "cakes" as const, to: "/admin/cake-flavours", label: "Cakes" },
   { key: "cookie_tins" as const, to: "/admin/cookie-tins", label: "Cookie Tins" },
   { key: "lite" as const, to: "/admin/lite", label: "Lite" },
