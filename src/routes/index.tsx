@@ -84,7 +84,7 @@ function Hero() {
           <Reveal delay={240}>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-7 md:text-lg">
               Made with <em className="not-italic font-medium text-foreground">Ragi, Foxtail Millet,
-              Oats & Sorghum .</em> Sweetened with jaggery. Crafted with premium couverture chocolate.
+              Oats & Sorghum.</em> Sweetened with jaggery. Crafted with premium couverture chocolate.
             </p>
           </Reveal>
           <Reveal delay={360}>
