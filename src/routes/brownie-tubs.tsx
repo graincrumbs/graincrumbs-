@@ -91,7 +91,7 @@ function BrownieTubsPage() {
           <Reveal delay={150}>
             <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-[color:var(--gold)]/25 shadow-[0_24px_60px_-28px_rgba(60,30,10,0.42)]">
               <img
-                src="/assets/grain-crumbs/Brownie-Tub.png"
+                src="/assets/grain-crumbs/br-tub.jpeg""
                 alt="Grain Crumbs Brownie Tub"
                 width={1200}
                 height={1500}
