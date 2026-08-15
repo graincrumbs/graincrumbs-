@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { flavours as fallbackFlavours, type Flavour } from "@/lib/flavours";
+import { tubFlavours as fallbackTubFlavours } from "@/lib/tub-flavours";
 import type { CookieTinVariant, ProductCollection } from "@/lib/product-collections";
 import {
   DEFAULT_CLASSIC_COOKIE_FLAVOURS,
@@ -60,6 +61,16 @@ const fallbackProducts: Product[] = fallbackFlavours.map((f) => ({
   variant: null,
 }));
 
+const fallbackTubProducts: Product[] = fallbackTubFlavours.map((f) => ({
+  ...f,
+  id: f.slug,
+  status: "live" as const,
+  premiumToppingLabel: "Premium Chocolate Toppings",
+  premiumToppingPrice: 35,
+  collection: "brownie_tubs" as const,
+  variant: null,
+}));
+
 function fallbackCookieFlavours(variant: CookieTinVariant): Product[] {
   const names = variant === "classic" ? DEFAULT_CLASSIC_COOKIE_FLAVOURS : DEFAULT_MILLET_COOKIE_FLAVOURS;
   return names.map((name) => ({
@@ -92,6 +103,13 @@ export function useLiveProducts() {
 }
 
 /**
+ * Fetches live Brownie Tub products for the public site.
+ */
+export function useLiveTubProducts() {
+  return useCollectionProducts("brownie_tubs", { status: "live" });
+}
+
+/**
  * Fetches products for a collection from Supabase with static fallbacks.
  */
 export function useCollectionProducts(collection: ProductCollection, options: CollectionQueryOptions = {}) {
@@ -99,9 +117,11 @@ export function useCollectionProducts(collection: ProductCollection, options: Co
   const fallback =
     collection === "brownies"
       ? fallbackProducts
-      : collection === "cookie_tins" && variant
-        ? fallbackCookieFlavours(variant)
-        : [];
+      : collection === "brownie_tubs"
+        ? fallbackTubProducts
+        : collection === "cookie_tins" && variant
+          ? fallbackCookieFlavours(variant)
+          : [];
 
   const [products, setProducts] = useState<Product[]>(fallback);
   const [loading, setLoading] = useState(true);
