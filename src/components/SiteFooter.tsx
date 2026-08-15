@@ -31,6 +31,7 @@ export function SiteFooter() {
           <p className="eyebrow mb-4">Explore</p>
           <ul className="space-y-2 text-sm">
             <li><Link to="/brownies" className="underline-link">Brownies</Link></li>
+            <li><Link to="/brownie-tubs" className="underline-link">Brownie Tubs</Link></li>
             <li><Link to="/brownie-cakes" className="underline-link">Brownie Cakes</Link></li>
             <li><Link to="/gifting" className="underline-link">Gifting</Link></li>
             <li><Link to="/about" className="underline-link">Our Story</Link></li>
