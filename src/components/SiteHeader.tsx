@@ -7,6 +7,7 @@ const logo = "/assets/grain-crumbs/logo-premium.png";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/brownies", label: "Brownies" },
+  { to: "/brownie-tubs", label: "Brownie Tubs" },
   { to: "/brownie-cakes", label: "Brownie Cakes" },
   { to: "/gifting", label: "Gifting" },
   { to: "/about", label: "About" },
