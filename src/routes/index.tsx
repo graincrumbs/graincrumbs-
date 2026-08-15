@@ -65,9 +65,11 @@ function Hero() {
       <div className="container-prose relative grid items-center gap-10 pt-12 pb-16 md:grid-cols-[1.05fr_1fr] md:pt-24 md:pb-28">
         <div>
           <Reveal>
+            {/* FIX: badge now forces its own line on mobile via basis-full,
+                and sits inline next to "Made fresh" from sm: breakpoint up */}
             <div className="flex flex-wrap items-center gap-3">
-              <p className="divider-gold eyebrow"> Made fresh <br></p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-green-600/40 bg-green-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-green-700">
+              <p className="divider-gold eyebrow">Made fresh</p>
+              <span className="inline-flex basis-full items-center gap-1.5 rounded-full border border-green-600/40 bg-green-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-green-700 sm:basis-auto">
                 <span className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 border-green-600 text-green-600">
                   <span className="block h-1.5 w-1.5 rounded-full bg-green-600" />
                 </span>
