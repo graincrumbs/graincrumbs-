@@ -17,7 +17,7 @@ type ProductForm = Omit<TablesInsert<"products">, "id" | "created_at" | "updated
 export type AdminProductsPanelConfig = {
   collection: ProductCollection;
   title: string;
-  navActive: "brownies" | "cookie_tins" | "lite" | "pro";
+  navActive: "brownies" | "brownie_tubs" | "cookie_tins" | "lite" | "pro";
   addLabel?: string;
   showVariant?: boolean;
   showPremiumTopping?: boolean;
