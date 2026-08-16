@@ -22,7 +22,7 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Premium millet brownies, baked fresh in Pune. Made with ragi, foxtail millet,
+            Premium millet brownies, baked fresh. Made with ragi, foxtail millet,
             oats & buckwheat. Sweetened with jaggery. Crafted with premium couverture chocolate.
           </p>
         </div>
@@ -42,10 +42,6 @@ export function SiteFooter() {
         <div>
           <p className="eyebrow mb-4">Visit · Connect</p>
           <ul className="space-y-3 text-sm">
-            <li className="flex items-start gap-2">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--gold)]" />
-              Kharadi, Pune
-            </li>
             <li className="flex items-start gap-2">
               <Phone className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--gold)]" />
               <a href="tel:+918208257574" className="underline-link">+91 82082 57574</a>
