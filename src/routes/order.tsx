@@ -26,10 +26,10 @@ export const Route = createFileRoute("/order")({
   component: OrderPage,
 });
 
-type ProductType = "Brownies" | "Brownie Tub" | "Brownie Cake" | "Gift Box" | "Bulk / Corporate Order";
+type ProductType = "Brownies" | "Brownie Tub" | "Brownie Cake" | "Calendar Brownie Cake" | "Gift Box" | "Bulk / Corporate Order";
 type Delivery = "Pickup" | "Delivery";
 
-const productTypes: ProductType[] = ["Brownies", "Brownie Tub", "Brownie Cake", "Gift Box", "Bulk / Corporate Order"];
+const productTypes: ProductType[] = ["Brownies", "Brownie Tub", "Brownie Cake", "Calendar Brownie Cake", "Gift Box", "Bulk / Corporate Order"];
 
 // Regular flavours + Assorted Box at the bottom
 const flavoursList = [
@@ -63,6 +63,13 @@ function parseBoxCount(qty: string): number | null {
 }
 
 const cakeWeights = ["250g", "500g", "650g", "1kg"];
+
+// Calendar Brownie Cake — fixed ~1.1kg, fixed price regardless of flavour
+const calendarMonths = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+const CALENDAR_CAKE_PRICE = 1350;
 
 const giftThemes = ["Birthday", "Anniversary", "Congratulations", "Thank You", "Baby Announcement", "Festival", "Other"];
 const giftQtyOptions = ["1", "2–5", "6–10", "10+"];
@@ -118,6 +125,9 @@ function OrderPage() {
     tubQty: tubQty[0],
     weight: cakeWeights[1],
     message: "", theme: "",
+    // Calendar Brownie Cake fields
+    calendarMonth: calendarMonths[0],
+    calendarDate: "",
     delivery: "Pickup" as Delivery,
     address: "",
     pincode: "",
@@ -202,6 +212,10 @@ function OrderPage() {
       form.type === "Brownie Cake" && `Weight: ${form.weight}`,
       form.type === "Brownie Cake" && form.message && `Cake message: ${form.message}`,
       form.type === "Brownie Cake" && form.theme && `Theme: ${form.theme}`,
+      form.type === "Calendar Brownie Cake" && `Flavour: ${form.flavour}`,
+      form.type === "Calendar Brownie Cake" && `Highlighted Date: ${form.calendarMonth} ${form.calendarDate}`,
+      form.type === "Calendar Brownie Cake" && form.message && `Personalised message: ${form.message}`,
+      form.type === "Calendar Brownie Cake" && `Price: ₹${CALENDAR_CAKE_PRICE} (Approx. 1.1kg)`,
       (form.type === "Brownies" || form.type === "Brownie Cake") && veganAddon && `Add-on: Vegan option (+₹${ADDON_PRICE})`,
       (form.type === "Brownies" || form.type === "Brownie Cake") && monkFruitAddon && `Add-on: 100% Monk Fruit sweetener option (+₹${ADDON_PRICE})`,
       form.type === "Gift Box" && `Gift Theme: ${form.giftTheme}`,
@@ -240,7 +254,7 @@ function OrderPage() {
     try {
       // Upload reference image if provided
       let imageUrl: string | null = null;
-      if (referenceImage && form.type === "Brownie Cake") {
+      if (referenceImage && (form.type === "Brownie Cake" || form.type === "Calendar Brownie Cake")) {
         const fileExt = referenceImage.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
@@ -271,7 +285,7 @@ function OrderPage() {
           : baseNotes || null;
 
       // For assorted box: flavour = "Assorted Box", weight = number of boxes
-      const flavourValue = form.type === "Brownies" || form.type === "Brownie Cake"
+      const flavourValue = form.type === "Brownies" || form.type === "Brownie Cake" || form.type === "Calendar Brownie Cake"
         ? hasCart && form.type === "Brownies"
           ? cartItems.map((i) => i.name).join(", ")
           : isAssortedBox
@@ -283,13 +297,15 @@ function OrderPage() {
 
       const weightValue = form.type === "Brownie Cake"
         ? form.weight
-        : form.type === "Brownies" && !hasCart
-          ? isAssortedBox
-            ? form.assortedQty
-            : form.browniePieces
-          : form.type === "Brownie Tub"
-            ? form.tubQty
-            : hasCart ? cartSummary : null;
+        : form.type === "Calendar Brownie Cake"
+          ? "Approx. 1.1kg"
+          : form.type === "Brownies" && !hasCart
+            ? isAssortedBox
+              ? form.assortedQty
+              : form.browniePieces
+            : form.type === "Brownie Tub"
+              ? form.tubQty
+              : hasCart ? cartSummary : null;
 
       // buildOrderPayload strips any key that isn't an actual orders column —
       // this is what prevents a stray field (e.g. pincode) from ever reaching
@@ -304,7 +320,9 @@ function OrderPage() {
         cake_message: form.message || null,
         theme: form.type === "Brownie Cake"
           ? form.theme || null
-          : form.type === "Gift Box" ? form.giftTheme : null,
+          : form.type === "Calendar Brownie Cake"
+            ? `Calendar date: ${form.calendarMonth} ${form.calendarDate} · Price: ₹${CALENDAR_CAKE_PRICE}`
+            : form.type === "Gift Box" ? form.giftTheme : null,
         delivery: form.delivery,
         address: form.delivery === "Delivery" ? form.address : null,
         pincode: form.delivery === "Delivery" ? form.pincode : null,
@@ -420,6 +438,7 @@ function OrderPage() {
   const isBrownies = form.type === "Brownies";
   const isTub = form.type === "Brownie Tub";
   const isBrownieCake = form.type === "Brownie Cake";
+  const isCalendarCake = form.type === "Calendar Brownie Cake";
 
   return (
     <>
@@ -670,6 +689,45 @@ function OrderPage() {
                   </>
                 )}
 
+                {/* CALENDAR BROWNIE CAKE */}
+                {isCalendarCake && (
+                  <>
+                    <Field label="Flavour">
+                      <select value={form.flavour} onChange={(e) => update("flavour", e.target.value)} className={inputCls}>
+                        {flavoursList.map((f) => <option key={f}>{f}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="Month">
+                      <select value={form.calendarMonth} onChange={(e) => update("calendarMonth", e.target.value)} className={inputCls}>
+                        {calendarMonths.map((m) => <option key={m}>{m}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="Highlighted Date" required>
+                      <input
+                        required
+                        inputMode="numeric"
+                        pattern="\d{1,2}"
+                        maxLength={2}
+                        value={form.calendarDate}
+                        onChange={(e) => update("calendarDate", e.target.value.replace(/\D/g, "").slice(0, 2))}
+                        className={inputCls}
+                        placeholder="e.g. 14"
+                      />
+                    </Field>
+                    <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
+                      <div className="flex items-end justify-between flex-wrap gap-2">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Price</p>
+                          <p className="mt-1 font-display text-3xl text-[color:var(--chocolate)]">₹{CALENDAR_CAKE_PRICE}</p>
+                        </div>
+                        <p className="max-w-xs text-right text-[11px] text-muted-foreground">
+                          Approx. 1.1kg, available in any flavour — same price across all flavours.
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 {/* GIFT BOX */}
                 {isGiftBox && (
                   <>
@@ -739,15 +797,17 @@ function OrderPage() {
                 )}
               </Fieldset>
 
-              {/* Customisation — only for Brownie Cake */}
-              {isBrownieCake && (
+              {/* Customisation — Brownie Cake & Calendar Brownie Cake */}
+              {(isBrownieCake || isCalendarCake) && (
                 <Fieldset title="Customisation" step="03">
                   <Field label="Cake Message" full>
                     <input value={form.message} onChange={(e) => update("message", e.target.value)} className={inputCls} placeholder="e.g. Happy Birthday, Aanya!" />
                   </Field>
-                  <Field label="Theme Request">
-                    <input value={form.theme} onChange={(e) => update("theme", e.target.value)} className={inputCls} placeholder="Floral, minimal, gold accents…" />
-                  </Field>
+                  {isBrownieCake && (
+                    <Field label="Theme Request">
+                      <input value={form.theme} onChange={(e) => update("theme", e.target.value)} className={inputCls} placeholder="Floral, minimal, gold accents…" />
+                    </Field>
+                  )}
                   <Field label="Reference Image (optional)" full>
                     <input
                       type="file"
@@ -765,7 +825,7 @@ function OrderPage() {
                 </Fieldset>
               )}
 
-              <Fieldset title="Delivery" step={isBrownieCake ? "04" : "03"}>
+              <Fieldset title="Delivery" step={(isBrownieCake || isCalendarCake) ? "04" : "03"}>
                 <Field label="How will you receive it?" full>
                   <ChipGroup options={["Pickup", "Delivery"]} value={form.delivery} onChange={(v) => update("delivery", v as Delivery)} />
                 </Field>
@@ -1007,4 +1067,3 @@ function DeliveryEstimateCard({
     </div>
   );
 }
-
