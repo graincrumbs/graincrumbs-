@@ -235,6 +235,66 @@ function Page() {
         </div>
       </section>
 
+      {/* ── CALENDAR BROWNIE CAKE ── */}
+      <section className="section" id="calendar-cake">
+        <div className="container-prose grid items-center gap-12 md:grid-cols-2">
+          <Reveal>
+            <p className="eyebrow text-[color:var(--gold)]">📅 Calendar Brownie Cake</p>
+            <h2 className="mt-3 font-display text-4xl md:text-5xl">
+              Because some dates deserve to be remembered forever.
+            </h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              Celebrate life's special moments with a handcrafted Calendar Brownie Cake. Simply choose your
+              month and highlight the date that means the most to you. Every calendar is individually
+              handcrafted, with the date numbers made using 100% Premium Couverture Chocolate.
+            </p>
+
+            <h3 className="mt-8 font-display text-xl text-[color:var(--chocolate-dark)]">Perfect For</h3>
+            <ul className="mt-3 grid grid-cols-1 gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+              <li>🎂 Birthdays</li>
+              <li>💍 Wedding Anniversaries</li>
+              <li>💼 Work Anniversaries & Promotions</li>
+              <li>🏢 Company Foundation Days & Milestones</li>
+              <li>🎓 Graduations & Achievements</li>
+              <li>👶 Baby Announcements & Family Milestones</li>
+              <li>❤️ First Meeting, Proposal or Engagement</li>
+              <li>✨ Or any date that deserves to be celebrated</li>
+            </ul>
+
+            <h3 className="mt-8 font-display text-xl text-[color:var(--chocolate-dark)]">What's Included</h3>
+            <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+              <li>✔️ Approx. 1.1 kg Brownie Cake</li>
+              <li>✔️ Available in any Grain Crumbs flavour (same price for all flavours)</li>
+              <li>✔️ Handcrafted edible calendar design</li>
+              <li>✔️ Date numbers made with 100% Premium Couverture Chocolate</li>
+              <li>✔️ Personalised message for your occasion</li>
+            </ul>
+
+            <div className="mt-6 flex items-center gap-3">
+              <span className="font-display text-3xl text-[color:var(--chocolate)]">₹1,350</span>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/order" className="btn-primary">Order Calendar Cake</Link>
+              <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline">
+                WhatsApp Enquiry
+              </a>
+            </div>
+          </Reveal>
+
+          <Reveal delay={120}>
+            <div className="relative mx-auto aspect-square w-full max-w-[480px] overflow-hidden rounded-[1.75rem] ring-1 ring-[color:var(--gold)]/25 shadow-[0_30px_60px_-30px_rgba(60,30,10,0.5)]">
+              <img
+                src="/assets/grain-crumbs/calendar-brownie-cake.png"
+                alt="Calendar Brownie Cake"
+                className={photo}
+                loading="lazy"
+              />
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ── OCCASIONS ── */}
       <section className="section bg-[color:var(--cream-dark)]/40" id="celebrations">
         <div className="container-prose">
