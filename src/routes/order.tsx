@@ -1,6 +1,13 @@
+```tsx
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Loader2, MapPin, MessageCircle, ShoppingBag } from "lucide-react";
+import {
+  CheckCircle2,
+  Loader2,
+  MapPin,
+  MessageCircle,
+  ShoppingBag,
+} from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { estimateDelivery } from "@/lib/delivery-estimate";
@@ -61,14 +68,24 @@ const flavoursList = [
 ];
 
 const ASSORTED_BOX = "Assorted Box";
-const flavoursWithAssorted = [...flavoursList, ASSORTED_BOX];
-
 const ASSORTED_BOX_PRICE = 789;
 
-const browniePieces = ["6 pieces", "12 pieces", "18 pieces", "24 pieces"];
+const browniePieces = [
+  "6 pieces",
+  "12 pieces",
+  "18 pieces",
+  "24 pieces",
+];
 
 const tubFlavoursList = tubFlavours.map((t) => t.name);
-const tubQty = ["1 tub", "2 tubs", "3 tubs", "4 tubs", "5 tubs", "6+ tubs"];
+const tubQty = [
+  "1 tub",
+  "2 tubs",
+  "3 tubs",
+  "4 tubs",
+  "5 tubs",
+  "6+ tubs",
+];
 
 function parseTubCount(qty: string): number | null {
   const match = qty.match(/^(\d+)/);
@@ -95,21 +112,6 @@ function parseBoxCount(qty: string): number | null {
 
 const cakeWeights = ["250g", "500g", "650g", "1kg"];
 
-const calendarMonths = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
 const CALENDAR_CAKE_PRICE = 1350;
 
 const giftThemes = [
@@ -125,7 +127,13 @@ const giftThemes = [
 const giftQtyOptions = ["1", "2–5", "6–10", "10+"];
 const giftBudgetOptions = ["₹250–₹500", "₹500–₹1000", "₹1000+"];
 
-const corporateBoxOptions = ["10–25", "25–50", "50–100", "100+"];
+const corporateBoxOptions = [
+  "10–25",
+  "25–50",
+  "50–100",
+  "100+",
+];
+
 const brandingOptions = [
   "Logo Sticker",
   "Custom Message Card",
@@ -163,7 +171,9 @@ function buildOrderPayload(payload: Record<string, unknown>) {
   const clean: Record<string, unknown> = {};
 
   for (const key of ORDERS_TABLE_COLUMNS) {
-    if (key in payload) clean[key] = payload[key];
+    if (key in payload) {
+      clean[key] = payload[key];
+    }
   }
 
   return clean;
@@ -171,7 +181,11 @@ function buildOrderPayload(payload: Record<string, unknown>) {
 
 function OrderPage() {
   const { from, calendar } = Route.useSearch();
-  const { items: cartItems, subtotal: cartSubtotal, clearCart } = useCart();
+  const {
+    items: cartItems,
+    subtotal: cartSubtotal,
+    clearCart,
+  } = useCart();
 
   const hasCart = from === "cart" && cartItems.length > 0;
 
@@ -179,8 +193,11 @@ function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
 
-  const [referenceImage, setReferenceImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [referenceImage, setReferenceImage] =
+    useState<File | null>(null);
+
+  const [imagePreview, setImagePreview] =
+    useState<string | null>(null);
 
   const [veganAddon, setVeganAddon] = useState(false);
   const [monkFruitAddon, setMonkFruitAddon] = useState(false);
@@ -191,27 +208,39 @@ function OrderPage() {
     name: "",
     phone: "",
     email: "",
-    type: (calendar ? "Brownie Cake" : "Brownies") as ProductType,
+
+    type: (calendar
+      ? "Brownie Cake"
+      : "Brownies") as ProductType,
+
     flavour: flavoursList[0],
+
     browniePieces: browniePieces[0],
+
     assortedQty: assortedBoxQty[0],
+
     tubFlavour: tubFlavoursList[0],
+
     tubQty: tubQty[0],
+
     weight: cakeWeights[1],
+
     message: "",
     theme: "",
 
+    // Calendar Brownie Cake
     calendarCake: calendar,
-    calendarMonth: calendarMonths[0],
 
-    // Stores the complete date selected from the calendar.
-    // Example: "2026-09-14"
+    // Stores selected date as YYYY-MM-DD
     calendarDate: "",
 
     delivery: "Pickup" as Delivery,
+
     address: "",
     pincode: "",
+
     occasion: "Birthday",
+
     date: "",
     notes: "",
 
@@ -227,7 +256,8 @@ function OrderPage() {
     corporateNotes: "",
   });
 
-  const isAssortedBox = form.flavour === ASSORTED_BOX;
+  const isAssortedBox =
+    form.flavour === ASSORTED_BOX;
 
   const assortedBoxCount = isAssortedBox
     ? parseBoxCount(form.assortedQty)
@@ -239,24 +269,45 @@ function OrderPage() {
       : null;
 
   const tubCount = parseTubCount(form.tubQty);
-  const tubUnitPrice = tubPriceFor(form.tubFlavour);
+
+  const tubUnitPrice = tubPriceFor(
+    form.tubFlavour,
+  );
 
   const tubTotal =
-    tubCount !== null ? tubCount * tubUnitPrice : null;
+    tubCount !== null
+      ? tubCount * tubUnitPrice
+      : null;
 
-  const estimate = estimateDelivery(form.pincode);
+  const estimate = estimateDelivery(
+    form.pincode,
+  );
 
-  const update = <K extends keyof typeof form>(
-    k: K,
-    v: (typeof form)[K],
-  ) => setForm((f) => ({ ...f, [k]: v }));
+  const update = <
+    K extends keyof typeof form
+  >(
+    key: K,
+    value: (typeof form)[K],
+  ) => {
+    setForm((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  };
 
   const toggleBranding = (option: string) => {
-    setForm((f) => ({
-      ...f,
-      corporateBranding: f.corporateBranding.includes(option)
-        ? f.corporateBranding.filter((b) => b !== option)
-        : [...f.corporateBranding, option],
+    setForm((current) => ({
+      ...current,
+
+      corporateBranding:
+        current.corporateBranding.includes(option)
+          ? current.corporateBranding.filter(
+              (item) => item !== option,
+            )
+          : [
+              ...current.corporateBranding,
+              option,
+            ],
     }));
   };
 
@@ -270,8 +321,11 @@ function OrderPage() {
     if (file) {
       const reader = new FileReader();
 
-      reader.onloadend = () =>
-        setImagePreview(reader.result as string);
+      reader.onloadend = () => {
+        setImagePreview(
+          reader.result as string,
+        );
+      };
 
       reader.readAsDataURL(file);
     } else {
@@ -280,37 +334,49 @@ function OrderPage() {
   };
 
   const cartSummary = useMemo(
-    () => (hasCart ? formatCartSummary(cartItems) : ""),
+    () =>
+      hasCart
+        ? formatCartSummary(cartItems)
+        : "",
     [hasCart, cartItems],
   );
 
-  // Convert YYYY-MM-DD into "Month Day".
-  // Example: "2026-09-14" -> "September 14"
+  // Convert YYYY-MM-DD into readable date.
+  // Example: 2026-09-14 → September 14
   const formattedCalendarDate = useMemo(() => {
-    if (!form.calendarDate) return "";
-
-    const [year, month, day] = form.calendarDate.split("-");
-
-    if (!year || !month || !day) return "";
-
-    const monthIndex = Number(month) - 1;
-
-    if (
-      monthIndex < 0 ||
-      monthIndex >= calendarMonths.length
-    ) {
+    if (!form.calendarDate) {
       return "";
     }
 
-    return `${calendarMonths[monthIndex]} ${Number(day)}`;
+    const date = new Date(
+      `${form.calendarDate}T00:00:00`,
+    );
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return date.toLocaleDateString(
+      "en-IN",
+      {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      },
+    );
   }, [form.calendarDate]);
 
   const waMessage = useMemo(() => {
     const lines = [
       `*New enquiry — Grain Crumbs*`,
+
       `Name: ${form.name}`,
+
       `Phone: ${form.phone}`,
-      form.email && `Email: ${form.email}`,
+
+      form.email &&
+        `Email: ${form.email}`,
+
       `Product: ${form.type}`,
 
       hasCart &&
@@ -444,7 +510,8 @@ function OrderPage() {
         form.address &&
         `Address: ${form.address}`,
 
-      form.type !== "Bulk / Corporate Order" &&
+      form.type !==
+        "Bulk / Corporate Order" &&
         `Occasion: ${form.occasion}`,
 
       form.date &&
@@ -470,7 +537,9 @@ function OrderPage() {
     formattedCalendarDate,
   ]);
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (
+    e: React.FormEvent,
+  ) => {
     e.preventDefault();
 
     const email = form.email.trim();
@@ -497,7 +566,9 @@ function OrderPage() {
       form.calendarCake &&
       !form.calendarDate
     ) {
-      alert("Please select a highlighted date from the calendar.");
+      alert(
+        "Please select a highlighted date from the calendar.",
+      );
       return;
     }
 
@@ -510,9 +581,10 @@ function OrderPage() {
         referenceImage &&
         form.type === "Brownie Cake"
       ) {
-        const fileExt = referenceImage.name
-          .split(".")
-          .pop();
+        const fileExt =
+          referenceImage.name
+            .split(".")
+            .pop();
 
         const fileName = `${Date.now()}-${Math.random()
           .toString(36)
@@ -521,9 +593,13 @@ function OrderPage() {
         const { error: uploadError } =
           await supabase.storage
             .from("order-images")
-            .upload(fileName, referenceImage, {
-              upsert: false,
-            });
+            .upload(
+              fileName,
+              referenceImage,
+              {
+                upsert: false,
+              },
+            );
 
         if (uploadError) {
           console.warn(
@@ -536,13 +612,15 @@ function OrderPage() {
               .from("order-images")
               .getPublicUrl(fileName);
 
-          imageUrl = urlData.publicUrl;
+          imageUrl =
+            urlData.publicUrl;
         }
       }
 
       const addonNotes = [
         veganAddon &&
           `Vegan option requested (+₹${ADDON_PRICE})`,
+
         monkFruitAddon &&
           `100% Monk Fruit sweetener option requested (+₹${ADDON_PRICE})`,
       ]
@@ -557,7 +635,8 @@ function OrderPage() {
         .join("\n");
 
       const cartNotes =
-        hasCart && form.type === "Brownies"
+        hasCart &&
+        form.type === "Brownies"
           ? [
               baseNotes,
               `Cart: ${cartSummary} (Est. ₹${cartSubtotal})`,
@@ -577,7 +656,8 @@ function OrderPage() {
       const flavourValue =
         form.type === "Brownies" ||
         form.type === "Brownie Cake"
-          ? hasCart && form.type === "Brownies"
+          ? hasCart &&
+            form.type === "Brownies"
             ? cartItems
                 .map((i) => i.name)
                 .join(", ")
@@ -593,7 +673,8 @@ function OrderPage() {
           ? form.calendarCake
             ? "Approx. 1.1kg"
             : form.weight
-          : form.type === "Brownies" && !hasCart
+          : form.type === "Brownies" &&
+              !hasCart
             ? isAssortedBox
               ? form.assortedQty
               : form.browniePieces
@@ -603,58 +684,69 @@ function OrderPage() {
                 ? cartSummary
                 : null;
 
-      const orderPayload = buildOrderPayload({
-        name: form.name,
-        phone: form.phone,
-        email,
-        product_type: form.type,
-        flavour: flavourValue,
-        weight: weightValue,
-        cake_message: form.message || null,
+      const orderPayload =
+        buildOrderPayload({
+          name: form.name,
+          phone: form.phone,
+          email,
+          product_type: form.type,
+          flavour: flavourValue,
+          weight: weightValue,
+          cake_message:
+            form.message || null,
 
-        theme:
-          form.type === "Brownie Cake"
-            ? form.calendarCake
-              ? `Calendar date: ${formattedCalendarDate} · Price: ₹${CALENDAR_CAKE_PRICE}`
-              : form.theme || null
-            : form.type === "Gift Box"
-              ? form.giftTheme
+          theme:
+            form.type === "Brownie Cake"
+              ? form.calendarCake
+                ? `Calendar date: ${formattedCalendarDate} · Price: ₹${CALENDAR_CAKE_PRICE}`
+                : form.theme || null
+              : form.type === "Gift Box"
+                ? form.giftTheme
+                : null,
+
+          delivery: form.delivery,
+
+          address:
+            form.delivery === "Delivery"
+              ? form.address
               : null,
 
-        delivery: form.delivery,
+          pincode:
+            form.delivery === "Delivery"
+              ? form.pincode
+              : null,
 
-        address:
-          form.delivery === "Delivery"
-            ? form.address
-            : null,
+          occasion:
+            form.type !==
+            "Bulk / Corporate Order"
+              ? form.occasion
+              : null,
 
-        pincode:
-          form.delivery === "Delivery"
-            ? form.pincode
-            : null,
+          date_required:
+            form.date || null,
 
-        occasion:
-          form.type !== "Bulk / Corporate Order"
-            ? form.occasion
-            : null,
+          notes: cartNotes,
 
-        date_required: form.date || null,
-        notes: cartNotes,
-        image_url: imageUrl,
-      });
+          image_url: imageUrl,
+        });
 
-      const { data, error } = await supabase
-        .from("orders")
-        .insert(orderPayload)
-        .select("order_number")
-        .single();
+      const { data, error } =
+        await supabase
+          .from("orders")
+          .insert(orderPayload)
+          .select("order_number")
+          .single();
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       const newOrderNumber =
         data?.order_number ?? null;
 
-      setOrderNumber(newOrderNumber);
+      setOrderNumber(
+        newOrderNumber,
+      );
 
       if (email) {
         try {
@@ -662,24 +754,42 @@ function OrderPage() {
             "https://api.emailjs.com/api/v1.0/email/send",
             {
               method: "POST",
+
               headers: {
-                "Content-Type": "application/json",
+                "Content-Type":
+                  "application/json",
               },
+
               body: JSON.stringify({
-                service_id: EMAILJS_SERVICE_ID,
-                template_id: EMAILJS_TEMPLATE_ID,
-                user_id: EMAILJS_PUBLIC_KEY,
+                service_id:
+                  EMAILJS_SERVICE_ID,
+
+                template_id:
+                  EMAILJS_TEMPLATE_ID,
+
+                user_id:
+                  EMAILJS_PUBLIC_KEY,
+
                 template_params: {
                   to_email: email,
-                  customer_name: form.name,
-                  order_number: String(
-                    newOrderNumber ?? "",
-                  ),
-                  product_type: form.type,
+
+                  customer_name:
+                    form.name,
+
+                  order_number:
+                    String(
+                      newOrderNumber ?? "",
+                    ),
+
+                  product_type:
+                    form.type,
+
                   delivery:
-                    form.delivery === "Delivery"
+                    form.delivery ===
+                    "Delivery"
                       ? `Delivery to ${form.address}`
                       : "Pickup",
+
                   date_required:
                     form.date ||
                     "To be confirmed",
@@ -695,7 +805,9 @@ function OrderPage() {
         }
       }
 
-      if (hasCart) clearCart();
+      if (hasCart) {
+        clearCart();
+      }
 
       setSubmitted(true);
     } catch (err) {
@@ -711,8 +823,11 @@ function OrderPage() {
               err !== null &&
               "message" in err
             ? String(
-                (err as { message: unknown })
-                  .message,
+                (
+                  err as {
+                    message: unknown;
+                  }
+                ).message,
               )
             : String(err);
 
@@ -726,7 +841,8 @@ function OrderPage() {
 
   if (submitted) {
     const isCorporate =
-      form.type === "Bulk / Corporate Order";
+      form.type ===
+      "Bulk / Corporate Order";
 
     return (
       <section className="section">
@@ -741,7 +857,8 @@ function OrderPage() {
                 Thank you!
               </h1>
 
-              {orderNumber !== null && (
+              {orderNumber !==
+                null && (
                 <div className="mt-6 inline-block rounded-2xl border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-8 py-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--gold)]">
                     Your Enquiry ID
@@ -762,7 +879,9 @@ function OrderPage() {
               {form.email && (
                 <p className="mt-3 text-sm text-[color:var(--gold)]">
                   A confirmation email has been sent to{" "}
-                  <strong>{form.email}</strong>
+                  <strong>
+                    {form.email}
+                  </strong>
                 </p>
               )}
 
@@ -796,7 +915,8 @@ function OrderPage() {
   }
 
   const isCorporate =
-    form.type === "Bulk / Corporate Order";
+    form.type ===
+    "Bulk / Corporate Order";
 
   const isGiftBox =
     form.type === "Gift Box";
@@ -811,7 +931,8 @@ function OrderPage() {
     form.type === "Brownie Cake";
 
   const isCalendarCake =
-    isBrownieCake && form.calendarCake;
+    isBrownieCake &&
+    form.calendarCake;
 
   return (
     <>
@@ -915,10 +1036,15 @@ function OrderPage() {
                   full
                 >
                   <ChipGroup
-                    options={productTypes}
+                    options={
+                      productTypes
+                    }
                     value={form.type}
                     onChange={(v) =>
-                      update("type", v)
+                      update(
+                        "type",
+                        v,
+                      )
                     }
                   />
                 </Field>
@@ -928,6 +1054,7 @@ function OrderPage() {
                     <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 p-5">
                       <div className="mb-3 flex items-center gap-2">
                         <ShoppingBag className="h-4 w-4 text-[color:var(--gold)]" />
+
                         <p className="eyebrow !mb-0">
                           Your cart
                         </p>
@@ -937,12 +1064,19 @@ function OrderPage() {
                         {cartItems.map(
                           (item) => (
                             <li
-                              key={item.slug}
+                              key={
+                                item.slug
+                              }
                               className="flex justify-between gap-4"
                             >
                               <span>
-                                {item.name} ×{" "}
-                                {item.quantity}
+                                {
+                                  item.name
+                                }{" "}
+                                ×{" "}
+                                {
+                                  item.quantity
+                                }
                               </span>
 
                               <span>
@@ -957,7 +1091,9 @@ function OrderPage() {
 
                       <p className="mt-4 font-display text-xl text-[color:var(--chocolate)]">
                         Estimated total: ₹
-                        {cartSubtotal}
+                        {
+                          cartSubtotal
+                        }
                       </p>
                     </div>
                   )}
@@ -970,14 +1106,19 @@ function OrderPage() {
                         full
                       >
                         <select
-                          value={form.flavour}
+                          value={
+                            form.flavour
+                          }
                           onChange={(e) =>
                             update(
                               "flavour",
-                              e.target.value,
+                              e.target
+                                .value,
                             )
                           }
-                          className={inputCls}
+                          className={
+                            inputCls
+                          }
                         >
                           {flavoursList.map(
                             (f) => (
@@ -1064,41 +1205,37 @@ function OrderPage() {
                         </div>
                       )}
 
-                      {isAssortedBox ? (
-                        <Field label="Number of Boxes">
-                          <ChipGroup
-                            options={
-                              assortedBoxQty
-                            }
-                            value={
-                              form.assortedQty
-                            }
-                            onChange={(v) =>
-                              update(
-                                "assortedQty",
-                                v,
-                              )
-                            }
-                          />
-                        </Field>
-                      ) : (
-                        <Field label="Number of Pieces">
-                          <ChipGroup
-                            options={
-                              browniePieces
-                            }
-                            value={
-                              form.browniePieces
-                            }
-                            onChange={(v) =>
-                              update(
-                                "browniePieces",
-                                v,
-                              )
-                            }
-                          />
-                        </Field>
-                      )}
+                      <Field
+                        label={
+                          isAssortedBox
+                            ? "Number of Boxes"
+                            : "Number of Pieces"
+                        }
+                      >
+                        <ChipGroup
+                          options={
+                            isAssortedBox
+                              ? assortedBoxQty
+                              : browniePieces
+                          }
+                          value={
+                            isAssortedBox
+                              ? form.assortedQty
+                              : form.browniePieces
+                          }
+                          onChange={(v) =>
+                            isAssortedBox
+                              ? update(
+                                  "assortedQty",
+                                  v,
+                                )
+                              : update(
+                                  "browniePieces",
+                                  v,
+                                )
+                          }
+                        />
+                      </Field>
 
                       <Field
                         label="Add-ons (Optional)"
@@ -1111,7 +1248,9 @@ function OrderPage() {
                               checked={
                                 veganAddon
                               }
-                              onChange={(e) =>
+                              onChange={(
+                                e,
+                              ) =>
                                 setVeganAddon(
                                   e.target
                                     .checked,
@@ -1119,8 +1258,12 @@ function OrderPage() {
                               }
                               className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
                             />
+
                             Vegan option (+₹
-                            {ADDON_PRICE})
+                            {
+                              ADDON_PRICE
+                            }
+                            )
                           </label>
 
                           <label className="flex items-center gap-2 cursor-pointer text-sm">
@@ -1129,7 +1272,9 @@ function OrderPage() {
                               checked={
                                 monkFruitAddon
                               }
-                              onChange={(e) =>
+                              onChange={(
+                                e,
+                              ) =>
                                 setMonkFruitAddon(
                                   e.target
                                     .checked,
@@ -1137,8 +1282,12 @@ function OrderPage() {
                               }
                               className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
                             />
+
                             100% Monk Fruit sweetener option (+₹
-                            {ADDON_PRICE})
+                            {
+                              ADDON_PRICE
+                            }
+                            )
                           </label>
                         </div>
                       </Field>
@@ -1158,14 +1307,19 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "tubFlavour",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       >
                         {tubFlavoursList.map(
                           (f) => (
-                            <option key={f}>
+                            <option
+                              key={f}
+                            >
                               {f}
                             </option>
                           ),
@@ -1261,14 +1415,19 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "flavour",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       >
                         {flavoursList.map(
                           (f) => (
-                            <option key={f}>
+                            <option
+                              key={f}
+                            >
                               {f}
                             </option>
                           ),
@@ -1324,35 +1483,7 @@ function OrderPage() {
 
                     {form.calendarCake && (
                       <>
-                        <Field label="Month">
-                          <select
-                            value={
-                              form.calendarMonth
-                            }
-                            onChange={(e) =>
-                              update(
-                                "calendarMonth",
-                                e.target
-                                  .value,
-                              )
-                            }
-                            className={
-                              inputCls
-                            }
-                          >
-                            {calendarMonths.map(
-                              (m) => (
-                                <option
-                                  key={m}
-                                >
-                                  {m}
-                                </option>
-                              ),
-                            )}
-                          </select>
-                        </Field>
-
-                        {/* NEW: Calendar date picker instead of manually entering the day */}
+                        {/* ONLY ONE DATE PICKER — NO SEPARATE MONTH FIELD */}
                         <Field
                           label="Highlighted Date"
                           required
@@ -1366,7 +1497,8 @@ function OrderPage() {
                             onChange={(e) =>
                               update(
                                 "calendarDate",
-                                e.target.value,
+                                e.target
+                                  .value,
                               )
                             }
                             className={
@@ -1376,7 +1508,7 @@ function OrderPage() {
 
                           {form.calendarDate && (
                             <p className="mt-2 text-xs text-muted-foreground">
-                              Selected highlighted date:{" "}
+                              Selected date:{" "}
                               <span className="font-medium text-foreground">
                                 {
                                   formattedCalendarDate
@@ -1429,8 +1561,12 @@ function OrderPage() {
                               }
                               className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
                             />
+
                             Vegan option (+₹
-                            {ADDON_PRICE})
+                            {
+                              ADDON_PRICE
+                            }
+                            )
                           </label>
 
                           <label className="flex items-center gap-2 cursor-pointer text-sm">
@@ -1447,8 +1583,12 @@ function OrderPage() {
                               }
                               className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
                             />
+
                             100% Monk Fruit sweetener option (+₹
-                            {ADDON_PRICE})
+                            {
+                              ADDON_PRICE
+                            }
+                            )
                           </label>
                         </div>
                       </Field>
@@ -1469,14 +1609,19 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "giftTheme",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       >
                         {giftThemes.map(
                           (t) => (
-                            <option key={t}>
+                            <option
+                              key={t}
+                            >
                               {t}
                             </option>
                           ),
@@ -1492,14 +1637,19 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "giftQty",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       >
                         {giftQtyOptions.map(
                           (o) => (
-                            <option key={o}>
+                            <option
+                              key={o}
+                            >
                               {o}
                             </option>
                           ),
@@ -1515,10 +1665,13 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "giftBudget",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       >
                         <option value="">
                           Select a range
@@ -1526,7 +1679,9 @@ function OrderPage() {
 
                         {giftBudgetOptions.map(
                           (o) => (
-                            <option key={o}>
+                            <option
+                              key={o}
+                            >
                               {o}
                             </option>
                           ),
@@ -1559,10 +1714,13 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "companyName",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                         placeholder="Your company name"
                       />
                     </Field>
@@ -1575,14 +1733,19 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "corporateBoxes",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       >
                         {corporateBoxOptions.map(
                           (o) => (
-                            <option key={o}>
+                            <option
+                              key={o}
+                            >
                               {o}
                             </option>
                           ),
@@ -1599,10 +1762,13 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "corporateDeliveryDate",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                       />
                     </Field>
 
@@ -1614,10 +1780,13 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "corporateBudgetPerBox",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                         placeholder="e.g. ₹500"
                       />
                     </Field>
@@ -1626,27 +1795,29 @@ function OrderPage() {
                       label="Branding Requirements"
                       full
                     >
-                      <div className="flex flex-wrap gap-3 mt-1">
+                      <div className="mt-1 flex flex-wrap gap-3">
                         {brandingOptions.map(
-                          (opt) => (
+                          (option) => (
                             <label
-                              key={opt}
+                              key={option}
                               className="flex items-center gap-2 cursor-pointer text-sm"
                             >
                               <input
                                 type="checkbox"
                                 checked={form.corporateBranding.includes(
-                                  opt,
+                                  option,
                                 )}
                                 onChange={() =>
                                   toggleBranding(
-                                    opt,
+                                    option,
                                   )
                                 }
                                 className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
                               />
 
-                              {opt}
+                              {
+                                option
+                              }
                             </label>
                           ),
                         )}
@@ -1664,7 +1835,8 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "corporateNotes",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
                         className={`${inputCls} min-h-24`}
@@ -1695,14 +1867,19 @@ function OrderPage() {
                     full
                   >
                     <input
-                      value={form.message}
+                      value={
+                        form.message
+                      }
                       onChange={(e) =>
                         update(
                           "message",
-                          e.target.value,
+                          e.target
+                            .value,
                         )
                       }
-                      className={inputCls}
+                      className={
+                        inputCls
+                      }
                       placeholder="e.g. Happy Birthday, Aanya!"
                     />
                   </Field>
@@ -1710,14 +1887,19 @@ function OrderPage() {
                   {!isCalendarCake && (
                     <Field label="Theme Request">
                       <input
-                        value={form.theme}
+                        value={
+                          form.theme
+                        }
                         onChange={(e) =>
                           update(
                             "theme",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                         placeholder="Floral, minimal, gold accents…"
                       />
                     </Field>
@@ -1739,7 +1921,9 @@ function OrderPage() {
                     {imagePreview && (
                       <div className="mt-3 overflow-hidden rounded-xl border border-[color:var(--gold)]/30">
                         <img
-                          src={imagePreview}
+                          src={
+                            imagePreview
+                          }
                           alt="Reference preview"
                           className="max-h-48 w-full object-cover"
                         />
@@ -1770,7 +1954,9 @@ function OrderPage() {
                       "Pickup",
                       "Delivery",
                     ]}
-                    value={form.delivery}
+                    value={
+                      form.delivery
+                    }
                     onChange={(v) =>
                       update(
                         "delivery",
@@ -1795,7 +1981,8 @@ function OrderPage() {
                         onChange={(e) =>
                           update(
                             "address",
-                            e.target.value,
+                            e.target
+                              .value,
                           )
                         }
                         className={`${inputCls} min-h-24`}
@@ -1829,7 +2016,9 @@ function OrderPage() {
                               ),
                           )
                         }
-                        className={inputCls}
+                        className={
+                          inputCls
+                        }
                         placeholder="e.g. 411014"
                       />
 
@@ -1854,14 +2043,19 @@ function OrderPage() {
                       onChange={(e) =>
                         update(
                           "occasion",
-                          e.target.value,
+                          e.target
+                            .value,
                         )
                       }
-                      className={inputCls}
+                      className={
+                        inputCls
+                      }
                     >
                       {occasions.map(
                         (o) => (
-                          <option key={o}>
+                          <option
+                            key={o}
+                          >
                             {o}
                           </option>
                         ),
@@ -1881,10 +2075,13 @@ function OrderPage() {
                     onChange={(e) =>
                       update(
                         "date",
-                        e.target.value,
+                        e.target
+                          .value,
                       )
                     }
-                    className={inputCls}
+                    className={
+                      inputCls
+                    }
                   />
                 </Field>
 
@@ -1900,7 +2097,8 @@ function OrderPage() {
                       onChange={(e) =>
                         update(
                           "notes",
-                          e.target.value,
+                          e.target
+                            .value,
                         )
                       }
                       className={`${inputCls} min-h-24`}
@@ -1928,7 +2126,9 @@ function OrderPage() {
 
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={
+                      submitting
+                    }
                     className="btn-primary disabled:opacity-60"
                   >
                     {submitting ? (
@@ -1958,20 +2158,22 @@ function OrderPage() {
                     "You hear back with availability and pricing.",
                     "You confirm details and complete payment.",
                     "We bake fresh — and deliver or arrange pickup.",
-                  ].map((s, i) => (
-                    <li
-                      key={s}
-                      className="flex gap-3"
-                    >
-                      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[color:var(--chocolate-dark)] text-[10px] text-[color:var(--cream)]">
-                        {i + 1}
-                      </span>
+                  ].map(
+                    (step, index) => (
+                      <li
+                        key={step}
+                        className="flex gap-3"
+                      >
+                        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[color:var(--chocolate-dark)] text-[10px] text-[color:var(--cream)]">
+                          {index + 1}
+                        </span>
 
-                      <span className="text-muted-foreground">
-                        {s}
-                      </span>
-                    </li>
-                  ))}
+                        <span className="text-muted-foreground">
+                          {step}
+                        </span>
+                      </li>
+                    ),
+                  )}
                 </ol>
               </div>
 
@@ -2046,7 +2248,9 @@ function Field({
   return (
     <label
       className={`block ${
-        full ? "sm:col-span-2" : ""
+        full
+          ? "sm:col-span-2"
+          : ""
       }`}
     >
       <span className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -2063,7 +2267,9 @@ function Field({
   );
 }
 
-function ChipGroup<T extends string>({
+function ChipGroup<
+  T extends string
+>({
   options,
   value,
   onChange,
@@ -2074,15 +2280,16 @@ function ChipGroup<T extends string>({
 }) {
   return (
     <div className="flex flex-wrap gap-2">
-      {options.map((o) => {
-        const active = o === value;
+      {options.map((option) => {
+        const active =
+          option === value;
 
         return (
           <button
-            key={o}
+            key={option}
             type="button"
             onClick={() =>
-              onChange(o)
+              onChange(option)
             }
             className={`rounded-full border px-4 py-2 text-sm transition ${
               active
@@ -2091,7 +2298,7 @@ function ChipGroup<T extends string>({
             }`}
             aria-pressed={active}
           >
-            {o}
+            {option}
           </button>
         );
       })}
@@ -2108,7 +2315,9 @@ function DeliveryEstimateCard({
   >;
   pincode: string;
 }) {
-  if (!pincode) return null;
+  if (!pincode) {
+    return null;
+  }
 
   const headerCls =
     "mt-4 rounded-2xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 p-5";
@@ -2128,10 +2337,12 @@ function DeliveryEstimateCard({
       `Hi Grain Crumbs! I'd like to confirm delivery availability and charges for my location (pincode: ${pincode}). Can you help?`,
     );
 
-  const whatsappQuoteUrl = `https://wa.me/918208257574?text=${whatsappQuoteText}`;
+  const whatsappQuoteUrl =
+    `https://wa.me/918208257574?text=${whatsappQuoteText}`;
 
   if (
-    estimate.kind === "unknown"
+    estimate.kind ===
+    "unknown"
   ) {
     return (
       <div className={headerCls}>
@@ -2148,7 +2359,9 @@ function DeliveryEstimateCard({
         </p>
 
         <a
-          href={whatsappQuoteUrl}
+          href={
+            whatsappQuoteUrl
+          }
           target="_blank"
           rel="noreferrer"
           className="mt-3 inline-flex items-center gap-2 rounded-full bg-[color:var(--gold)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--chocolate-dark)] hover:opacity-90 transition-opacity"
@@ -2160,7 +2373,10 @@ function DeliveryEstimateCard({
     );
   }
 
-  if (estimate.kind === "quote") {
+  if (
+    estimate.kind ===
+    "quote"
+  ) {
     return (
       <div className={headerCls}>
         <div className="flex items-center gap-2 text-[color:var(--chocolate-dark)]">
@@ -2173,7 +2389,9 @@ function DeliveryEstimateCard({
 
         <p className="mt-1 text-xs text-muted-foreground">
           ~{estimate.km} km from Kharadi ·{" "}
-          {estimate.label}
+          {
+            estimate.label
+          }
         </p>
 
         <p className="mt-2 text-sm text-muted-foreground">
@@ -2181,7 +2399,9 @@ function DeliveryEstimateCard({
         </p>
 
         <a
-          href={whatsappQuoteUrl}
+          href={
+            whatsappQuoteUrl
+          }
           target="_blank"
           rel="noreferrer"
           className="mt-3 inline-flex items-center gap-2 rounded-full bg-[color:var(--gold)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--chocolate-dark)] hover:opacity-90 transition-opacity"
@@ -2204,7 +2424,9 @@ function DeliveryEstimateCard({
       </div>
 
       <p className="mt-3 font-display text-3xl text-[color:var(--chocolate-dark)]">
-        {estimate.charge}{" "}
+        {
+          estimate.charge
+        }{" "}
         <span className="text-sm font-normal text-muted-foreground">
           (Approx.)
         </span>
@@ -2212,7 +2434,9 @@ function DeliveryEstimateCard({
 
       <p className="mt-1 text-xs text-muted-foreground">
         ~{estimate.km} km from Kharadi ·{" "}
-        {estimate.label}
+        {
+          estimate.label
+        }
       </p>
 
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
@@ -2225,3 +2449,4 @@ function DeliveryEstimateCard({
     </div>
   );
 }
+```
