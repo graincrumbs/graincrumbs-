@@ -275,7 +275,7 @@ function Page() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/order" className="btn-primary">Order Calendar Cake</Link>
+              <Link to="/order" search={{ calendar: "1" }} className="btn-primary">Order Calendar Cake</Link>
               <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline">
                 WhatsApp Enquiry
               </a>
