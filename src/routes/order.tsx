@@ -14,6 +14,7 @@ const EMAILJS_PUBLIC_KEY = "P8p-EPatFJBMOHmsz";
 export const Route = createFileRoute("/order")({
   validateSearch: (search: Record<string, unknown>) => ({
     from: (search.from as string) ?? "",
+    calendar: search.calendar === "1" || search.calendar === "true",
   }),
   head: () => ({
     meta: [
@@ -26,10 +27,10 @@ export const Route = createFileRoute("/order")({
   component: OrderPage,
 });
 
-type ProductType = "Brownies" | "Brownie Tub" | "Brownie Cake" | "Calendar Brownie Cake" | "Gift Box" | "Bulk / Corporate Order";
+type ProductType = "Brownies" | "Brownie Tub" | "Brownie Cake" | "Gift Box" | "Bulk / Corporate Order";
 type Delivery = "Pickup" | "Delivery";
 
-const productTypes: ProductType[] = ["Brownies", "Brownie Tub", "Brownie Cake", "Calendar Brownie Cake", "Gift Box", "Bulk / Corporate Order"];
+const productTypes: ProductType[] = ["Brownies", "Brownie Tub", "Brownie Cake", "Gift Box", "Bulk / Corporate Order"];
 
 // Regular flavours + Assorted Box at the bottom
 const flavoursList = [
@@ -98,7 +99,7 @@ function buildOrderPayload(payload: Record<string, unknown>) {
 }
 
 function OrderPage() {
-  const { from } = Route.useSearch();
+  const { from, calendar } = Route.useSearch();
   const { items: cartItems, subtotal: cartSubtotal, clearCart } = useCart();
   const hasCart = from === "cart" && cartItems.length > 0;
 
@@ -117,7 +118,7 @@ function OrderPage() {
 
   const [form, setForm] = useState({
     name: "", phone: "", email: "",
-    type: "Brownies" as ProductType,
+    type: (calendar ? "Brownie Cake" : "Brownies") as ProductType,
     flavour: flavoursList[0],
     browniePieces: browniePieces[0],
     assortedQty: assortedBoxQty[0],
@@ -125,7 +126,8 @@ function OrderPage() {
     tubQty: tubQty[0],
     weight: cakeWeights[1],
     message: "", theme: "",
-    // Calendar Brownie Cake fields
+    // Calendar Brownie Cake — now a toggle nested inside Brownie Cake, not a separate product type
+    calendarCake: calendar,
     calendarMonth: calendarMonths[0],
     calendarDate: "",
     delivery: "Pickup" as Delivery,
@@ -209,15 +211,16 @@ function OrderPage() {
       form.type === "Brownie Tub" && `Quantity: ${form.tubQty}`,
       form.type === "Brownie Tub" && tubTotal !== null && `Estimated Total: ₹${tubTotal}`,
       form.type === "Brownie Cake" && `Flavour: ${form.flavour}`,
-      form.type === "Brownie Cake" && `Weight: ${form.weight}`,
-      form.type === "Brownie Cake" && form.message && `Cake message: ${form.message}`,
-      form.type === "Brownie Cake" && form.theme && `Theme: ${form.theme}`,
-      form.type === "Calendar Brownie Cake" && `Flavour: ${form.flavour}`,
-      form.type === "Calendar Brownie Cake" && `Highlighted Date: ${form.calendarMonth} ${form.calendarDate}`,
-      form.type === "Calendar Brownie Cake" && form.message && `Personalised message: ${form.message}`,
-      form.type === "Calendar Brownie Cake" && `Price: ₹${CALENDAR_CAKE_PRICE} (Approx. 1.1kg)`,
-      (form.type === "Brownies" || form.type === "Brownie Cake") && veganAddon && `Add-on: Vegan option (+₹${ADDON_PRICE})`,
-      (form.type === "Brownies" || form.type === "Brownie Cake") && monkFruitAddon && `Add-on: 100% Monk Fruit sweetener option (+₹${ADDON_PRICE})`,
+      form.type === "Brownie Cake" && !form.calendarCake && `Weight: ${form.weight}`,
+      form.type === "Brownie Cake" && !form.calendarCake && form.message && `Cake message: ${form.message}`,
+      form.type === "Brownie Cake" && !form.calendarCake && form.theme && `Theme: ${form.theme}`,
+      form.type === "Brownie Cake" && form.calendarCake && `Highlighted Date: ${form.calendarMonth} ${form.calendarDate}`,
+      form.type === "Brownie Cake" && form.calendarCake && form.message && `Personalised message: ${form.message}`,
+      form.type === "Brownie Cake" && form.calendarCake && `Price: ₹${CALENDAR_CAKE_PRICE} (Approx. 1.1kg)`,
+      form.type === "Brownies" && veganAddon && `Add-on: Vegan option (+₹${ADDON_PRICE})`,
+      form.type === "Brownies" && monkFruitAddon && `Add-on: 100% Monk Fruit sweetener option (+₹${ADDON_PRICE})`,
+      form.type === "Brownie Cake" && !form.calendarCake && veganAddon && `Add-on: Vegan option (+₹${ADDON_PRICE})`,
+      form.type === "Brownie Cake" && !form.calendarCake && monkFruitAddon && `Add-on: 100% Monk Fruit sweetener option (+₹${ADDON_PRICE})`,
       form.type === "Gift Box" && `Gift Theme: ${form.giftTheme}`,
       form.type === "Gift Box" && `Number of Boxes: ${form.giftQty}`,
       form.type === "Gift Box" && form.giftBudget && `Budget per Box: ${form.giftBudget}`,
@@ -254,7 +257,7 @@ function OrderPage() {
     try {
       // Upload reference image if provided
       let imageUrl: string | null = null;
-      if (referenceImage && (form.type === "Brownie Cake" || form.type === "Calendar Brownie Cake")) {
+      if (referenceImage && form.type === "Brownie Cake") {
         const fileExt = referenceImage.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
@@ -285,7 +288,7 @@ function OrderPage() {
           : baseNotes || null;
 
       // For assorted box: flavour = "Assorted Box", weight = number of boxes
-      const flavourValue = form.type === "Brownies" || form.type === "Brownie Cake" || form.type === "Calendar Brownie Cake"
+      const flavourValue = form.type === "Brownies" || form.type === "Brownie Cake"
         ? hasCart && form.type === "Brownies"
           ? cartItems.map((i) => i.name).join(", ")
           : isAssortedBox
@@ -296,16 +299,14 @@ function OrderPage() {
           : null;
 
       const weightValue = form.type === "Brownie Cake"
-        ? form.weight
-        : form.type === "Calendar Brownie Cake"
-          ? "Approx. 1.1kg"
-          : form.type === "Brownies" && !hasCart
-            ? isAssortedBox
-              ? form.assortedQty
-              : form.browniePieces
-            : form.type === "Brownie Tub"
-              ? form.tubQty
-              : hasCart ? cartSummary : null;
+        ? (form.calendarCake ? "Approx. 1.1kg" : form.weight)
+        : form.type === "Brownies" && !hasCart
+          ? isAssortedBox
+            ? form.assortedQty
+            : form.browniePieces
+          : form.type === "Brownie Tub"
+            ? form.tubQty
+            : hasCart ? cartSummary : null;
 
       // buildOrderPayload strips any key that isn't an actual orders column —
       // this is what prevents a stray field (e.g. pincode) from ever reaching
@@ -319,10 +320,10 @@ function OrderPage() {
         weight: weightValue,
         cake_message: form.message || null,
         theme: form.type === "Brownie Cake"
-          ? form.theme || null
-          : form.type === "Calendar Brownie Cake"
-            ? `Calendar date: ${form.calendarMonth} ${form.calendarDate} · Price: ₹${CALENDAR_CAKE_PRICE}`
-            : form.type === "Gift Box" ? form.giftTheme : null,
+          ? (form.calendarCake
+              ? `Calendar date: ${form.calendarMonth} ${form.calendarDate} · Price: ₹${CALENDAR_CAKE_PRICE}`
+              : form.theme || null)
+          : form.type === "Gift Box" ? form.giftTheme : null,
         delivery: form.delivery,
         address: form.delivery === "Delivery" ? form.address : null,
         pincode: form.delivery === "Delivery" ? form.pincode : null,
@@ -438,7 +439,7 @@ function OrderPage() {
   const isBrownies = form.type === "Brownies";
   const isTub = form.type === "Brownie Tub";
   const isBrownieCake = form.type === "Brownie Cake";
-  const isCalendarCake = form.type === "Calendar Brownie Cake";
+  const isCalendarCake = isBrownieCake && form.calendarCake;
 
   return (
     <>
@@ -653,7 +654,7 @@ function OrderPage() {
                   </>
                 )}
 
-                {/* BROWNIE CAKE */}
+                {/* BROWNIE CAKE — includes the Calendar Brownie Cake option */}
                 {isBrownieCake && (
                   <>
                     <Field label="Flavour">
@@ -661,70 +662,82 @@ function OrderPage() {
                         {flavoursList.map((f) => <option key={f}>{f}</option>)}
                       </select>
                     </Field>
-                    <Field label="Weight / Size">
-                      <ChipGroup options={cakeWeights} value={form.weight} onChange={(v) => update("weight", v)} />
-                    </Field>
-                    <Field label="Add-ons (Optional)" full>
-                      <div className="flex flex-col gap-2">
-                        <label className="flex items-center gap-2 cursor-pointer text-sm">
-                          <input
-                            type="checkbox"
-                            checked={veganAddon}
-                            onChange={(e) => setVeganAddon(e.target.checked)}
-                            className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
-                          />
-                          Vegan option (+₹{ADDON_PRICE})
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer text-sm">
-                          <input
-                            type="checkbox"
-                            checked={monkFruitAddon}
-                            onChange={(e) => setMonkFruitAddon(e.target.checked)}
-                            className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
-                          />
-                          100% Monk Fruit sweetener option (+₹{ADDON_PRICE})
-                        </label>
-                      </div>
-                    </Field>
-                  </>
-                )}
 
-                {/* CALENDAR BROWNIE CAKE */}
-                {isCalendarCake && (
-                  <>
-                    <Field label="Flavour">
-                      <select value={form.flavour} onChange={(e) => update("flavour", e.target.value)} className={inputCls}>
-                        {flavoursList.map((f) => <option key={f}>{f}</option>)}
-                      </select>
+                    {!form.calendarCake && (
+                      <Field label="Weight / Size">
+                        <ChipGroup options={cakeWeights} value={form.weight} onChange={(v) => update("weight", v)} />
+                      </Field>
+                    )}
+
+                    <Field label="Calendar Brownie Cake" full>
+                      <label className="flex items-center gap-2 cursor-pointer text-sm">
+                        <input
+                          type="checkbox"
+                          checked={form.calendarCake}
+                          onChange={(e) => update("calendarCake", e.target.checked)}
+                          className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                        />
+                        📅 Make this a Calendar Brownie Cake (Approx. 1.1kg, fixed price ₹{CALENDAR_CAKE_PRICE})
+                      </label>
                     </Field>
-                    <Field label="Month">
-                      <select value={form.calendarMonth} onChange={(e) => update("calendarMonth", e.target.value)} className={inputCls}>
-                        {calendarMonths.map((m) => <option key={m}>{m}</option>)}
-                      </select>
-                    </Field>
-                    <Field label="Highlighted Date" required>
-                      <input
-                        required
-                        inputMode="numeric"
-                        pattern="\d{1,2}"
-                        maxLength={2}
-                        value={form.calendarDate}
-                        onChange={(e) => update("calendarDate", e.target.value.replace(/\D/g, "").slice(0, 2))}
-                        className={inputCls}
-                        placeholder="e.g. 14"
-                      />
-                    </Field>
-                    <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
-                      <div className="flex items-end justify-between flex-wrap gap-2">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Price</p>
-                          <p className="mt-1 font-display text-3xl text-[color:var(--chocolate)]">₹{CALENDAR_CAKE_PRICE}</p>
+
+                    {form.calendarCake && (
+                      <>
+                        <Field label="Month">
+                          <select value={form.calendarMonth} onChange={(e) => update("calendarMonth", e.target.value)} className={inputCls}>
+                            {calendarMonths.map((m) => <option key={m}>{m}</option>)}
+                          </select>
+                        </Field>
+                        <Field label="Highlighted Date" required>
+                          <input
+                            required
+                            inputMode="numeric"
+                            pattern="\d{1,2}"
+                            maxLength={2}
+                            value={form.calendarDate}
+                            onChange={(e) => update("calendarDate", e.target.value.replace(/\D/g, "").slice(0, 2))}
+                            className={inputCls}
+                            placeholder="e.g. 14"
+                          />
+                        </Field>
+                        <div className="sm:col-span-2 rounded-xl border border-[color:var(--gold)]/30 bg-[color:var(--cream-dark)]/40 px-5 py-4">
+                          <div className="flex items-end justify-between flex-wrap gap-2">
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Price</p>
+                              <p className="mt-1 font-display text-3xl text-[color:var(--chocolate)]">₹{CALENDAR_CAKE_PRICE}</p>
+                            </div>
+                            <p className="max-w-xs text-right text-[11px] text-muted-foreground">
+                              Approx. 1.1kg, available in any flavour — same price across all flavours.
+                            </p>
+                          </div>
                         </div>
-                        <p className="max-w-xs text-right text-[11px] text-muted-foreground">
-                          Approx. 1.1kg, available in any flavour — same price across all flavours.
-                        </p>
-                      </div>
-                    </div>
+                      </>
+                    )}
+
+                    {!form.calendarCake && (
+                      <Field label="Add-ons (Optional)" full>
+                        <div className="flex flex-col gap-2">
+                          <label className="flex items-center gap-2 cursor-pointer text-sm">
+                            <input
+                              type="checkbox"
+                              checked={veganAddon}
+                              onChange={(e) => setVeganAddon(e.target.checked)}
+                              className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                            />
+                            Vegan option (+₹{ADDON_PRICE})
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-sm">
+                            <input
+                              type="checkbox"
+                              checked={monkFruitAddon}
+                              onChange={(e) => setMonkFruitAddon(e.target.checked)}
+                              className="h-4 w-4 rounded border-input accent-[color:var(--chocolate-dark)]"
+                            />
+                            100% Monk Fruit sweetener option (+₹{ADDON_PRICE})
+                          </label>
+                        </div>
+                      </Field>
+                    )}
                   </>
                 )}
 
@@ -797,13 +810,13 @@ function OrderPage() {
                 )}
               </Fieldset>
 
-              {/* Customisation — Brownie Cake & Calendar Brownie Cake */}
-              {(isBrownieCake || isCalendarCake) && (
+              {/* Customisation — Brownie Cake, including the Calendar Brownie Cake option */}
+              {isBrownieCake && (
                 <Fieldset title="Customisation" step="03">
                   <Field label="Cake Message" full>
                     <input value={form.message} onChange={(e) => update("message", e.target.value)} className={inputCls} placeholder="e.g. Happy Birthday, Aanya!" />
                   </Field>
-                  {isBrownieCake && (
+                  {!isCalendarCake && (
                     <Field label="Theme Request">
                       <input value={form.theme} onChange={(e) => update("theme", e.target.value)} className={inputCls} placeholder="Floral, minimal, gold accents…" />
                     </Field>
@@ -825,7 +838,7 @@ function OrderPage() {
                 </Fieldset>
               )}
 
-              <Fieldset title="Delivery" step={(isBrownieCake || isCalendarCake) ? "04" : "03"}>
+              <Fieldset title="Delivery" step={isBrownieCake ? "04" : "03"}>
                 <Field label="How will you receive it?" full>
                   <ChipGroup options={["Pickup", "Delivery"]} value={form.delivery} onChange={(v) => update("delivery", v as Delivery)} />
                 </Field>
