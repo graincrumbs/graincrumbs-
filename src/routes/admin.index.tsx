@@ -60,6 +60,25 @@ function isAssortedBoxOrder(flavour: string | null): boolean {
   return !!(flavour && flavour.toLowerCase().includes("assorted box"));
 }
 
+// Detect Calendar Brownie Cake orders — these are saved as a normal
+// "Brownie Cake" product_type, but the order.tsx form stamps the
+// highlighted date + price into the `theme` column, e.g.
+// "Calendar highlighted date: 2026-02-14 · Price: ₹1350"
+function isCalendarCakeOrder(order: Pick<Order, "product_type" | "theme">): boolean {
+  return !!(
+    order.product_type === "Brownie Cake" &&
+    order.theme &&
+    order.theme.toLowerCase().includes("calendar highlighted date")
+  );
+}
+
+// Pull just the highlighted date out of the theme string for quick display.
+function calendarCakeDateDisplay(theme: string | null): string {
+  if (!theme) return "—";
+  const match = theme.match(/calendar highlighted date:\s*([^·]+)/i);
+  return match ? match[1].trim() : theme;
+}
+
 // Display-friendly flavour label for the table
 function flavourDisplay(order: Order): string {
   if (!order.flavour) return "—";
@@ -133,7 +152,8 @@ function AdminDashboard() {
           !o.phone.toLowerCase().includes(s) &&
           !(o.email ?? "").toLowerCase().includes(s) &&
           !o.product_type.toLowerCase().includes(s) &&
-          !(o.flavour ?? "").toLowerCase().includes(s)
+          !(o.flavour ?? "").toLowerCase().includes(s) &&
+          !(o.theme ?? "").toLowerCase().includes(s)
         ) return false;
       }
       return true;
@@ -233,7 +253,7 @@ function AdminDashboard() {
                     key={o.id}
                     onClick={() => { setActive(o); setLightbox(false); }}
                     className={`cursor-pointer border-t border-border hover:bg-[color:var(--cream-dark)]/30 ${
-                      isAssortedBoxOrder(o.flavour) ? "bg-[color:var(--gold)]/5" : ""
+                      isAssortedBoxOrder(o.flavour) || isCalendarCakeOrder(o) ? "bg-[color:var(--gold)]/5" : ""
                     }`}
                   >
                     <td className="px-4 py-3 font-mono text-sm font-semibold text-[color:var(--chocolate-dark)]">#{o.order_number}</td>
@@ -250,7 +270,14 @@ function AdminDashboard() {
                         {o.phone}
                       </a>
                     </td>
-                    <td className="px-4 py-3">{o.product_type}</td>
+                    <td className="px-4 py-3">
+                      {o.product_type}
+                      {isCalendarCakeOrder(o) && (
+                        <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-2 py-0.5 text-[10px] font-medium text-[color:var(--chocolate-dark)]">
+                          📅 Calendar Cake
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       {isAssortedBoxOrder(o.flavour) ? (
                         <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-2 py-0.5 text-xs font-medium text-[color:var(--chocolate-dark)]">
@@ -282,7 +309,7 @@ function AdminDashboard() {
               key={o.id}
               onClick={() => { setActive(o); setLightbox(false); }}
               className={`cursor-pointer rounded-2xl border border-border bg-card p-4 transition hover:border-[color:var(--gold)]/60 active:scale-[0.99] ${
-                isAssortedBoxOrder(o.flavour) ? "border-[color:var(--gold)]/30 bg-[color:var(--gold)]/5" : ""
+                isAssortedBoxOrder(o.flavour) || isCalendarCakeOrder(o) ? "border-[color:var(--gold)]/30 bg-[color:var(--gold)]/5" : ""
               }`}
             >
               {/* Top row: order number + status */}
@@ -293,6 +320,12 @@ function AdminDashboard() {
 
               {/* Customer name */}
               <p className="mt-2 font-display text-xl text-[color:var(--chocolate-dark)]">{o.name}</p>
+
+              {isCalendarCakeOrder(o) && (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-2 py-0.5 text-[10px] font-medium text-[color:var(--chocolate-dark)]">
+                  📅 Calendar Cake · {calendarCakeDateDisplay(o.theme)}
+                </span>
+              )}
 
               {/* Product + flavour */}
               <p className="mt-0.5 text-sm text-muted-foreground">
@@ -362,6 +395,17 @@ function AdminDashboard() {
                 <div>
                   <p className="text-sm font-semibold text-[color:var(--chocolate-dark)]">Assorted Box Order</p>
                   <p className="text-xs text-muted-foreground">All 6 flavours · 6 pieces per box · {active.weight ?? "qty not specified"}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Calendar Brownie Cake banner in modal */}
+            {isCalendarCakeOrder(active) && (
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-[color:var(--gold)]/40 bg-[color:var(--cream-dark)]/60 px-4 py-3">
+                <span className="text-xl">📅</span>
+                <div>
+                  <p className="text-sm font-semibold text-[color:var(--chocolate-dark)]">Calendar Brownie Cake Order</p>
+                  <p className="text-xs text-muted-foreground">Highlighted date: {calendarCakeDateDisplay(active.theme)} · Approx. 1.1kg</p>
                 </div>
               </div>
             )}
