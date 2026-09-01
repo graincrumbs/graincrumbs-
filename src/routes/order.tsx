@@ -1,4 +1,3 @@
-```tsx
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CheckCircle2, Loader2, MapPin, MessageCircle, ShoppingBag } from "lucide-react";
@@ -2226,4 +2225,3 @@ function DeliveryEstimateCard({
     </div>
   );
 }
-```
