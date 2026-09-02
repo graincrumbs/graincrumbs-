@@ -406,6 +406,18 @@ function Page() {
       {/* ───────────── CALENDAR BROWNIE CAKE ───────────── */}
       <section className="section" id="calendar-cake">
         <div className="container-prose grid items-center gap-12 md:grid-cols-2">
+          {/* Image shows first on mobile, stays on the right on desktop */}
+          <Reveal delay={120} className="order-first md:order-none">
+            <div className="relative mx-auto aspect-square w-full max-w-[480px] overflow-hidden rounded-[1.75rem] ring-1 ring-[color:var(--gold)]/25 shadow-[0_30px_60px_-30px_rgba(60,30,10,0.5)]">
+              <img
+                src="/assets/grain-crumbs/calendar-brownie-cake.png"
+                alt="Calendar Brownie Cake"
+                className={photo}
+                loading="lazy"
+              />
+            </div>
+          </Reveal>
+
           <Reveal>
             <p className="eyebrow text-[color:var(--gold)]">
               📅 Calendar Brownie Cake
@@ -478,17 +490,6 @@ function Page() {
               >
                 WhatsApp Enquiry
               </a>
-            </div>
-          </Reveal>
-
-          <Reveal delay={120}>
-            <div className="relative mx-auto aspect-square w-full max-w-[480px] overflow-hidden rounded-[1.75rem] ring-1 ring-[color:var(--gold)]/25 shadow-[0_30px_60px_-30px_rgba(60,30,10,0.5)]">
-              <img
-                src="/assets/grain-crumbs/calendar-brownie-cake.png"
-                alt="Calendar Brownie Cake"
-                className={photo}
-                loading="lazy"
-              />
             </div>
           </Reveal>
         </div>
