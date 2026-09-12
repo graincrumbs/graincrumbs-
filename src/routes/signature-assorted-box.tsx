@@ -10,14 +10,9 @@ const logo = "/assets/grain-crumbs/logo-premium.png";
 // ─────────────────────────────────────────────────────────────
 // EDIT THESE LINES ONLY when you need to change price /
 // Zomato link / product photo for this page.
-//
-// ⚠️ ZOMATO_URL is a placeholder and will 404 as-is. Ask the client
-// for their real Zomato page link (search "Grain Crumbs" on Zomato
-// and copy the address bar URL, or pull it from their Zomato
-// business dashboard) and paste it in below before this goes live.
 // ─────────────────────────────────────────────────────────────
 const PRODUCT_PRICE = 749;
-const ZOMATO_URL: string | null = null; // ← paste the client's real Zomato link here, e.g. "https://www.zomato.com/pune/grain-crumbs-xyz-area"
+const ZOMATO_URL: string | null = "https://www.zomato.com/pune/grain-crumbs-kharadi";
 const PRODUCT_IMAGE = giftBoxImg;
 // ─────────────────────────────────────────────────────────────
 
