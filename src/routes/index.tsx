@@ -111,10 +111,18 @@ function Hero() {
               >
                 Customise Your Cake
               </Link>
+              <span className="text-border">·</span>
+              <Link
+                to="/signature-assorted-box"
+                className="text-[color:var(--chocolate)] underline underline-offset-2"
+              >
+                Signature Assorted Box
+              </Link>
             </div>
             <div className="mt-3 hidden flex-wrap gap-3 sm:flex">
               <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline w-full sm:w-auto">Request a Quote</a>
               <Link to="/brownie-cakes" className="btn-outline w-full sm:w-auto">Customise Your Cake</Link>
+              <Link to="/signature-assorted-box" className="btn-outline w-full sm:w-auto">Signature Assorted Box</Link>
             </div>
           </Reveal>
           <Reveal delay={500}>
