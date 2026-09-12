@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -112,21 +113,29 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+// Routes listed here render WITHOUT the full site header/footer (no nav links
+// to other products/categories). Use this for single-product landing pages
+// meant to be shared as a standalone link (e.g. Instagram product link),
+// where the page must only ever show that one product.
+const MINIMAL_CHROME_ROUTES = ["/signature-assorted-box"];
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isMinimalChrome = MINIMAL_CHROME_ROUTES.includes(pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <div className="flex min-h-dvh flex-col bg-background">
-          <SiteHeader />
+          {!isMinimalChrome && <SiteHeader />}
           <main className="flex-1">
             <Outlet />
           </main>
-          <SiteFooter />
+          {!isMinimalChrome && <SiteFooter />}
         </div>
         <Toaster position="bottom-center" richColors />
-        <AiConciergeWidget />
+        {!isMinimalChrome && <AiConciergeWidget />}
       </CartProvider>
     </QueryClientProvider>
   );
