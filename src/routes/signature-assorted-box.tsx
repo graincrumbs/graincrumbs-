@@ -14,6 +14,18 @@ const logo = "/assets/grain-crumbs/logo-premium.png";
 const PRODUCT_PRICE = 749;
 const ZOMATO_URL: string | null = "https://www.zomato.com/pune/grain-crumbs-kharadi";
 const PRODUCT_IMAGE = giftBoxImg;
+
+// Instagram/Meta's crawler needs a FULL absolute https:// image URL — a
+// relative/bundled path (like the imported giftBoxImg above) will not be
+// recognised. Make sure this file actually exists at this exact URL on
+// the live site.
+const SITE_URL = "https://graincrumbs.com";
+const PRODUCT_PAGE_URL = `${SITE_URL}/signature-assorted-box`;
+// giftBoxImg (imported above) is a bundled asset — Vite turns it into a
+// path like "/assets/signature-assorted-box-XXXXXX.png" at build time, so
+// we can't hardcode the filename. Just prefix it with the site URL to get
+// a full absolute https:// link, which is what Instagram requires.
+const PRODUCT_IMAGE_ABSOLUTE = new URL(PRODUCT_IMAGE, SITE_URL).toString();
 // ─────────────────────────────────────────────────────────────
 
 // Official Zomato mark (via simple-icons, MIT-licensed), used for the
@@ -35,12 +47,54 @@ export const Route = createFileRoute("/signature-assorted-box")({
         content:
           "Grain Crumbs Signature Assorted Box — 6 handcrafted millet brownie pieces, beautifully gift-wrapped. ₹749/-. Order directly on WhatsApp or Zomato.",
       },
+      // ── Open Graph (required for Instagram/Facebook "Add products") ──
+      { property: "og:type", content: "product" },
       { property: "og:title", content: "Signature Assorted Box — Grain Crumbs" },
       {
         property: "og:description",
         content: "6 handcrafted millet brownie pieces in a signature gift box. ₹749/-.",
       },
-      { property: "og:image", content: PRODUCT_IMAGE },
+      { property: "og:image", content: PRODUCT_IMAGE_ABSOLUTE },
+      { property: "og:image:secure_url", content: PRODUCT_IMAGE_ABSOLUTE },
+      { property: "og:url", content: PRODUCT_PAGE_URL },
+      { property: "og:site_name", content: "Grain Crumbs" },
+      { property: "product:price:amount", content: String(PRODUCT_PRICE) },
+      { property: "product:price:currency", content: "INR" },
+      { property: "product:availability", content: "in stock" },
+      // ── Twitter Card (Instagram/Meta also checks these) ──
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Signature Assorted Box — Grain Crumbs" },
+      {
+        name: "twitter:description",
+        content: "6 handcrafted millet brownie pieces in a signature gift box. ₹749/-.",
+      },
+      { name: "twitter:image", content: PRODUCT_IMAGE_ABSOLUTE },
+    ],
+    links: [{ rel: "canonical", href: PRODUCT_PAGE_URL }],
+    // ── Product JSON-LD (Schema.org) — this is the #1 thing Instagram's
+    // crawler looks for to recognise a page as a single purchasable product.
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "Signature Assorted Box",
+          image: [PRODUCT_IMAGE_ABSOLUTE],
+          description:
+            "Grain Crumbs Signature Assorted Box — 6 handcrafted millet brownie pieces, beautifully gift-wrapped.",
+          brand: { "@type": "Brand", name: "Grain Crumbs" },
+          sku: "signature-assorted-box",
+          offers: {
+            "@type": "Offer",
+            url: PRODUCT_PAGE_URL,
+            priceCurrency: "INR",
+            price: String(PRODUCT_PRICE),
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+          },
+        }),
+      },
     ],
   }),
   component: SignatureAssortedBoxPage,
