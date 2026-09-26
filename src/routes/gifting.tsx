@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gift, Building2, HeartHandshake, Sparkles, Package, ArrowRight } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Gift, Building2, HeartHandshake, Sparkles, Package } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { WHATSAPP_ORDER_URL } from "@/lib/whatsapp";
 import { GiftRecommender } from "@/components/ai/GiftRecommender";
 import { diwaliHampers } from "@/lib/diwali-hampers";
+import { DiwaliHamperCard } from "@/components/DiwaliHamperCard";
 
 export const Route = createFileRoute("/gifting")({
   head: () => ({
@@ -103,41 +104,21 @@ function Page() {
             </p>
           </Reveal>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-8">
             {diwaliHampers.map((h, i) => (
-              <Reveal key={h.slug} delay={i * 80}>
-                <Link
-                  to="/diwali-hampers"
-                  className="card-warm group flex h-full flex-col overflow-hidden p-0 transition hover:ring-2 hover:ring-[color:var(--gold)]/50"
-                >
-                  <img
-                    src={h.image}
-                    alt={h.name}
-                    loading="lazy"
-                    className="aspect-square w-full object-cover"
-                  />
-                  <div className="flex flex-1 flex-col p-6">
-                    <h3 className="font-display text-xl">{h.name}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{h.blurb}</p>
-                    <p className="mt-3 text-sm font-medium text-[color:var(--chocolate)]">
-                      From ₹{h.tiers[0].pricePerUnit} · Bulk from ₹{h.tiers[h.tiers.length - 1].pricePerUnit} each
-                    </p>
-                    <span className="mt-5 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium transition group-hover:border-[color:var(--gold)] group-hover:text-[color:var(--chocolate)]">
-                      Order This Hamper <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                </Link>
+              <Reveal key={h.slug} delay={i * 60}>
+                <DiwaliHamperCard hamper={h} />
               </Reveal>
             ))}
           </div>
 
-          <Reveal className="mt-10 flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-center">
-            <Link to="/diwali-hampers" className="btn-primary w-full sm:w-auto">
-              View All Diwali Hampers &amp; Order <ArrowRight className="h-4 w-4" />
-            </Link>
+          <Reveal className="mt-8 flex flex-col items-center gap-2 text-center">
             <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline w-full sm:w-auto">
               Bulk Enquiry (100+ units)
             </a>
+            <p className="text-xs text-muted-foreground">
+              For orders of 100 or more, WhatsApp us for custom bulk pricing.
+            </p>
           </Reveal>
         </div>
       </section>
