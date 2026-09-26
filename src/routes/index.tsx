@@ -100,17 +100,22 @@ function Hero() {
             </p>
           </Reveal>
           <Reveal delay={360}>
+            {/* Simplified: 2 clear actions only. Full menu list lives in the "Choose a Menu" section below. */}
             <div className="mt-7 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap md:mt-9">
               <Link to="/order" className="btn-primary w-full sm:w-auto">
                 Order Now <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/brownies" className="btn-outline w-full sm:w-auto">View Menu</Link>
+              <a href="#our-menus" className="btn-outline w-full sm:w-auto">View Our Menus</a>
             </div>
-            <div className="mt-3 flex flex-wrap gap-3">
-              <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline w-full sm:w-auto">Request a Quote</a>
-              <Link to="/brownie-tubs" className="btn-outline w-full sm:w-auto">Brownie Tub</Link>
-              <Link to="/brownie-cakes" className="btn-outline w-full sm:w-auto">Customise Your Cake</Link>
-              <Link to="/signature-assorted-box" className="btn-outline w-full sm:w-auto">Signature Assorted Box</Link>
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+              <a
+                href={WHATSAPP_ORDER_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[color:var(--chocolate)] underline underline-offset-2"
+              >
+                Request a Quote on WhatsApp
+              </a>
             </div>
           </Reveal>
           <Reveal delay={500}>
