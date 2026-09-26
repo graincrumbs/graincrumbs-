@@ -20,6 +20,16 @@ import { useLiveProducts } from "@/lib/use-products";
 import { useSitePage } from "@/lib/use-site-page";
 import { WHATSAPP_ORDER_URL, WHATSAPP_PLAIN_URL } from "@/lib/whatsapp";
 
+// Clean, single source of truth for the 5 core menus the client wants
+// front-and-center on the homepage (fixes: "Brownie Tub not visible on 1st page").
+const MENUS = [
+  { to: "/brownies", label: "View Brownie Menu" },
+  { to: "/brownie-tubs", label: "View Brownie Tub Menu" },
+  { to: "/brownie-cakes", label: "View Brownie Cake Menu" },
+  { to: "/signature-assorted-box", label: "View Assorted Boxes Menu" },
+  { to: "/gifting", label: "View Festive/Personal Gifting Menu" },
+] as const;
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -43,6 +53,7 @@ function Home() {
   return (
     <>
       <Hero />
+      <MenuMenu />
       <WhyUs />
       <Collections />
       <Flavours />
@@ -88,41 +99,22 @@ function Hero() {
             </p>
           </Reveal>
           <Reveal delay={360}>
-            {/* FIX 1: On mobile — 2 main buttons + secondary actions as text links */}
+            {/* Simplified: 2 clear actions only. Full menu list lives in the MenuMenu section below. */}
             <div className="mt-7 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap md:mt-9">
               <Link to="/order" className="btn-primary w-full sm:w-auto">
                 Order Now <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/brownies" className="btn-outline w-full sm:w-auto">View Menu</Link>
+              <a href="#our-menus" className="btn-outline w-full sm:w-auto">View Our Menus</a>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm sm:hidden">
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
               <a
                 href={WHATSAPP_ORDER_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[color:var(--chocolate)] underline underline-offset-2"
               >
-                Request a Quote
+                Request a Quote on WhatsApp
               </a>
-              <span className="text-border">·</span>
-              <Link
-                to="/brownie-cakes"
-                className="text-[color:var(--chocolate)] underline underline-offset-2"
-              >
-                Customise Your Cake
-              </Link>
-              <span className="text-border">·</span>
-              <Link
-                to="/signature-assorted-box"
-                className="text-[color:var(--chocolate)] underline underline-offset-2"
-              >
-                Signature Assorted Box
-              </Link>
-            </div>
-            <div className="mt-3 hidden flex-wrap gap-3 sm:flex">
-              <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline w-full sm:w-auto">Request a Quote</a>
-              <Link to="/brownie-cakes" className="btn-outline w-full sm:w-auto">Customise Your Cake</Link>
-              <Link to="/signature-assorted-box" className="btn-outline w-full sm:w-auto">Signature Assorted Box</Link>
             </div>
           </Reveal>
           <Reveal delay={500}>
@@ -159,6 +151,49 @@ function Hero() {
           <div className="absolute -right-4 top-8 hidden rounded-full bg-[color:var(--gold)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--chocolate-dark)] shadow-md md:block">
             No Maida · No Refined Sugar
           </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// Clean, uncluttered menu picker — the one thing every visitor should see
+// on the first screen: 5 clear menus, each leading straight to its page.
+function MenuMenu() {
+  return (
+    <section id="our-menus" className="section scroll-mt-24 pt-0 md:pt-0">
+      <div className="container-prose">
+        <Reveal className="text-center">
+          <p className="eyebrow">Explore</p>
+          <h2 className="mt-3 font-display text-3xl md:text-4xl">Choose a Menu</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
+            Pick a category, browse the flavours, then order online or on WhatsApp.
+          </p>
+        </Reveal>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {MENUS.map((m, i) => (
+            <Reveal key={m.to} delay={i * 80}>
+              <Link
+                to={m.to}
+                className="group flex h-full flex-col justify-between gap-4 rounded-2xl border border-border bg-card p-6 text-center transition-all hover:border-[color:var(--gold)] hover:shadow-md sm:text-left"
+              >
+                <span className="font-display text-lg leading-snug">{m.label}</span>
+                <span className="inline-flex items-center justify-center gap-2 text-sm font-medium text-[color:var(--chocolate)] group-hover:text-[color:var(--gold)] sm:justify-start">
+                  Browse <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Link to="/order" className="btn-primary w-full sm:w-auto">
+            Place an Order <ArrowRight className="h-4 w-4" />
+          </Link>
+          <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline w-full sm:w-auto">
+            Order on WhatsApp
+          </a>
         </Reveal>
       </div>
     </section>
