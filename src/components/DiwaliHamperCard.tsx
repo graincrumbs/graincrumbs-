@@ -28,12 +28,12 @@ export function DiwaliHamperCard({ hamper }: { hamper: DiwaliHamper }) {
 
   return (
     <div className="card-warm grid gap-6 p-6 md:grid-cols-[0.85fr_1.15fr] md:p-8">
-      <div className="overflow-hidden rounded-2xl ring-1 ring-[color:var(--gold)]/25">
+      <div className="flex items-center justify-center overflow-hidden rounded-2xl bg-[color:var(--cream-dark)]/30 p-3 ring-1 ring-[color:var(--gold)]/25">
         <img
           src={hamper.image}
           alt={hamper.name}
           loading="lazy"
-          className="aspect-square h-full w-full object-cover"
+          className="max-h-[420px] w-full rounded-lg object-contain"
         />
       </div>
 
