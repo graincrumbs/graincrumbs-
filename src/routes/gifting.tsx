@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Gift, Building2, HeartHandshake, Sparkles, Package } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Gift, Building2, HeartHandshake, Sparkles, Package, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { WHATSAPP_ORDER_URL } from "@/lib/whatsapp";
 import { GiftRecommender } from "@/components/ai/GiftRecommender";
+import { diwaliHampers } from "@/lib/diwali-hampers";
 
 export const Route = createFileRoute("/gifting")({
   head: () => ({
@@ -25,46 +26,6 @@ export const Route = createFileRoute("/gifting")({
 
 const gifting = "/assets/grain-crumbs/gifting-premium.png";
 const giftingHamper = "/assets/grain-crumbs/gifting-hamper.png";
-
-// Diwali 2026 corporate/bulk hamper range — using the client's own designed
-// marketing images directly. Dhamaka & Shagun share one image (as she sent it).
-const diwaliHampers = [
-  {
-    name: "Pastel Green Rajwadi",
-    blurb: "3 brownies, clay diya, Gita shloka card, Roli Chawal & Kumkum, personalised thank-you card.",
-    from: 369,
-    bulkFrom: 320,
-    image: "/assets/grain-crumbs/diwali-2026/diwali-01-pastel-green-rajwadi.jpg",
-  },
-  {
-    name: "Peach Rajwadi",
-    blurb: "3 brownies, clay diya, Gita shloka card, Roli Chawal & Kumkum, personalised thank-you card.",
-    from: 379,
-    bulkFrom: 330,
-    image: "/assets/grain-crumbs/diwali-2026/diwali-02-peach-rajwadi.jpg",
-  },
-  {
-    name: "Diwali Dhamaka Blue Box",
-    blurb: "4 brownie pieces including Cappuccino Walnut, personalised thank-you card included.",
-    from: 314,
-    bulkFrom: 264,
-    image: "/assets/grain-crumbs/diwali-2026/diwali-03-blue-boxes-dhamaka-shagun.jpg",
-  },
-  {
-    name: "Diwali Shagun Blue Box",
-    blurb: "4 brownie pieces including Cappuccino Walnut, personalised thank-you card included.",
-    from: 290,
-    bulkFrom: 240,
-    image: "/assets/grain-crumbs/diwali-2026/diwali-03-blue-boxes-dhamaka-shagun.jpg",
-  },
-  {
-    name: "Diwali Mode On",
-    blurb: "3 brownies, Roli Chawal & Kumkum dome glass bottle, personalised thank-you card.",
-    from: 300,
-    bulkFrom: 250,
-    image: "/assets/grain-crumbs/diwali-2026/diwali-04-mode-on.jpg",
-  },
-] as const;
 
 
 const useCases = [
@@ -144,43 +105,39 @@ function Page() {
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {diwaliHampers.map((h, i) => (
-              <Reveal key={h.name} delay={i * 80}>
-                <div className="card-warm flex h-full flex-col overflow-hidden p-0">
+              <Reveal key={h.slug} delay={i * 80}>
+                <Link
+                  to="/diwali-hampers"
+                  className="card-warm group flex h-full flex-col overflow-hidden p-0 transition hover:ring-2 hover:ring-[color:var(--gold)]/50"
+                >
                   <img
                     src={h.image}
-                    alt={`${h.name} — Diwali hamper pricing and details`}
+                    alt={h.name}
                     loading="lazy"
-                    className="w-full object-cover object-top"
+                    className="aspect-square w-full object-cover"
                   />
                   <div className="flex flex-1 flex-col p-6">
                     <h3 className="font-display text-xl">{h.name}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{h.blurb}</p>
                     <p className="mt-3 text-sm font-medium text-[color:var(--chocolate)]">
-                      From ₹{h.from} · Bulk from ₹{h.bulkFrom} each
+                      From ₹{h.tiers[0].pricePerUnit} · Bulk from ₹{h.tiers[h.tiers.length - 1].pricePerUnit} each
                     </p>
-                    <a
-                      href={`https://wa.me/918208257574?text=${encodeURIComponent(
-                        `Hi Grain Crumbs! I'd like to enquire about the ${h.name} Diwali hamper.\n\nQuantity:\nDelivery Address:\nCompany Name (for thank-you card, if any):`,
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-outline mt-5 w-full"
-                    >
-                      WhatsApp for {h.name}
-                    </a>
+                    <span className="mt-5 inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium transition group-hover:border-[color:var(--gold)] group-hover:text-[color:var(--chocolate)]">
+                      Order This Hamper <ArrowRight className="h-4 w-4" />
+                    </span>
                   </div>
-                </div>
+                </Link>
               </Reveal>
             ))}
           </div>
 
           <Reveal className="mt-10 flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-center">
-            <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-primary w-full sm:w-auto">
-              Bulk Order Enquiry (50+ units)
+            <Link to="/diwali-hampers" className="btn-primary w-full sm:w-auto">
+              View All Diwali Hampers &amp; Order <ArrowRight className="h-4 w-4" />
+            </Link>
+            <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-outline w-full sm:w-auto">
+              Bulk Enquiry (100+ units)
             </a>
-            <p className="text-sm text-muted-foreground">
-              Custom flavours, quantities or card messages? WhatsApp us and we'll tailor it for you.
-            </p>
           </Reveal>
         </div>
       </section>
