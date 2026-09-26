@@ -68,7 +68,7 @@ export const diwaliHampers: DiwaliHamper[] = [
       "Personalised thank-you card (personal or company)",
     ],
     boxSize: "6 × 6 × 1.75 in (15.2 × 15.2 × 4.4 cm)",
-    image: "/assets/grain-crumbs/diwali-2026/diwali-03-blue-boxes-dhamaka-shagun.jpg",
+    image: "/assets/grain-crumbs/diwali-2026/diwali-03-dhamaka-blue-box.jpg",
     tiers: [
       { minQty: 1, pricePerUnit: 314 },
       { minQty: 5, pricePerUnit: 314 },
@@ -88,7 +88,7 @@ export const diwaliHampers: DiwaliHamper[] = [
       "Personalised thank-you card (personal or company)",
     ],
     boxSize: "4 × 4 × 0.5 in (10.2 × 10.2 × 1.3 cm)",
-    image: "/assets/grain-crumbs/diwali-2026/diwali-03-blue-boxes-dhamaka-shagun.jpg",
+    image: "/assets/grain-crumbs/diwali-2026/diwali-04-shagun-blue-box.jpg",
     tiers: [
       { minQty: 1, pricePerUnit: 290 },
       { minQty: 5, pricePerUnit: 290 },
@@ -109,7 +109,7 @@ export const diwaliHampers: DiwaliHamper[] = [
       "Personalised thank-you card (personal or company)",
     ],
     boxSize: "6.5 × 3.5 × 2 in (16.5 × 8.9 × 5.1 cm)",
-    image: "/assets/grain-crumbs/diwali-2026/diwali-04-mode-on.jpg",
+    image: "/assets/grain-crumbs/diwali-2026/diwali-05-mode-on.jpg",
     tiers: [
       { minQty: 1, pricePerUnit: 300 },
       { minQty: 5, pricePerUnit: 292 },
