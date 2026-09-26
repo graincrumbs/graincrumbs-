@@ -26,6 +26,46 @@ export const Route = createFileRoute("/gifting")({
 const gifting = "/assets/grain-crumbs/gifting-premium.png";
 const giftingHamper = "/assets/grain-crumbs/gifting-hamper.png";
 
+// Diwali 2026 corporate/bulk hamper range — using the client's own designed
+// marketing images directly. Dhamaka & Shagun share one image (as she sent it).
+const diwaliHampers = [
+  {
+    name: "Pastel Green Rajwadi",
+    blurb: "3 brownies, clay diya, Gita shloka card, Roli Chawal & Kumkum, personalised thank-you card.",
+    from: 369,
+    bulkFrom: 320,
+    image: "/assets/grain-crumbs/diwali-2026/diwali-01-pastel-green-rajwadi.jpg",
+  },
+  {
+    name: "Peach Rajwadi",
+    blurb: "3 brownies, clay diya, Gita shloka card, Roli Chawal & Kumkum, personalised thank-you card.",
+    from: 379,
+    bulkFrom: 330,
+    image: "/assets/grain-crumbs/diwali-2026/diwali-02-peach-rajwadi.jpg",
+  },
+  {
+    name: "Diwali Dhamaka Blue Box",
+    blurb: "4 brownie pieces including Cappuccino Walnut, personalised thank-you card included.",
+    from: 314,
+    bulkFrom: 264,
+    image: "/assets/grain-crumbs/diwali-2026/diwali-03-blue-boxes-dhamaka-shagun.jpg",
+  },
+  {
+    name: "Diwali Shagun Blue Box",
+    blurb: "4 brownie pieces including Cappuccino Walnut, personalised thank-you card included.",
+    from: 290,
+    bulkFrom: 240,
+    image: "/assets/grain-crumbs/diwali-2026/diwali-03-blue-boxes-dhamaka-shagun.jpg",
+  },
+  {
+    name: "Diwali Mode On",
+    blurb: "3 brownies, Roli Chawal & Kumkum dome glass bottle, personalised thank-you card.",
+    from: 300,
+    bulkFrom: 250,
+    image: "/assets/grain-crumbs/diwali-2026/diwali-04-mode-on.jpg",
+  },
+] as const;
+
 
 const useCases = [
   { icon: Gift, title: "Birthdays", text: "A premium box that feels celebratory before it's even opened." },
@@ -88,6 +128,60 @@ function Page() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border/60 bg-[color:var(--cream-dark)]/25">
+        <div className="container-prose py-16 md:py-20">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow">Corporate &amp; Bulk · Diwali 2026</p>
+            <h2 className="mt-3 font-display text-4xl md:text-5xl">Diwali Gifting for Your Team.</h2>
+            <p className="mt-4 text-muted-foreground">
+              Millet brownie hampers, sweetened naturally with jaggery and made with real, honest
+              ingredients. Pre-orders are open — place your order before 1st November.
+            </p>
+          </Reveal>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {diwaliHampers.map((h, i) => (
+              <Reveal key={h.name} delay={i * 80}>
+                <div className="card-warm flex h-full flex-col overflow-hidden p-0">
+                  <img
+                    src={h.image}
+                    alt={`${h.name} — Diwali hamper pricing and details`}
+                    loading="lazy"
+                    className="w-full object-cover object-top"
+                  />
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="font-display text-xl">{h.name}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{h.blurb}</p>
+                    <p className="mt-3 text-sm font-medium text-[color:var(--chocolate)]">
+                      From ₹{h.from} · Bulk from ₹{h.bulkFrom} each
+                    </p>
+                    <a
+                      href={`https://wa.me/918208257574?text=${encodeURIComponent(
+                        `Hi Grain Crumbs! I'd like to enquire about the ${h.name} Diwali hamper.\n\nQuantity:\nDelivery Address:\nCompany Name (for thank-you card, if any):`,
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-outline mt-5 w-full"
+                    >
+                      WhatsApp for {h.name}
+                    </a>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal className="mt-10 flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-center">
+            <a href={WHATSAPP_ORDER_URL} target="_blank" rel="noreferrer" className="btn-primary w-full sm:w-auto">
+              Bulk Order Enquiry (50+ units)
+            </a>
+            <p className="text-sm text-muted-foreground">
+              Custom flavours, quantities or card messages? WhatsApp us and we'll tailor it for you.
+            </p>
+          </Reveal>
         </div>
       </section>
 
