@@ -7,6 +7,7 @@ import {
   Leaf,
   Heart,
   ArrowRight,
+  Quote,
   Youtube,
 } from "lucide-react";
 import founderImg from "@/assets/founder.jpg";
@@ -18,7 +19,7 @@ import { Reveal } from "@/components/Reveal";
 import { useLiveProducts } from "@/lib/use-products";
 import { useSitePage } from "@/lib/use-site-page";
 import { WHATSAPP_ORDER_URL, WHATSAPP_PLAIN_URL } from "@/lib/whatsapp";
-import { GoogleReviewsWidget } from "@/components/GoogleReviewsWidget";
+import { useGoogleReviews } from "@/lib/use-google-reviews";
 
 // Clean, single source of truth for the 5 core menus the client wants
 // front-and-center on the homepage (fixes: "Brownie Tub not visible on 1st page").
@@ -597,17 +598,57 @@ function BehindTheScenes() {
   );
 }
 
+const reviews = [
+  { text: "Everyone loved it. The cake disappeared in 10 minutes.", who: "Priya · Birthday Order" },
+  { text: "Should have ordered double. So glad I found you.", who: "Nikhil · Office Gifting" },
+  { text: "Less sweet and perfect. My kids didn't realise it was millet.", who: "Anita · Repeat Customer" },
+];
+
 function Reviews() {
+  const { configured, rating, totalReviews, reviews: googleReviews, mapsUrl } = useGoogleReviews();
+
+  // Live 5-star Google reviews once GOOGLE_PLACES_API_KEY is set on the
+  // server; until then, quietly falls back to the original testimonials
+  // below so the section never looks empty or broken.
+  const showGoogle = configured && googleReviews.length > 0;
+  const items = showGoogle
+    ? googleReviews.slice(0, 6).map((r) => ({ text: r.text, who: r.author }))
+    : reviews;
+
   return (
     <section className="section bg-[color:var(--cream-dark)]/40">
       <div className="container-prose">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">From our customers</p>
-          <h2 className="mt-3 font-display text-4xl md:text-5xl">5-Star Reviews on Google.</h2>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl">
+            {showGoogle ? "5-Star Reviews on Google." : "Notes from the WhatsApp inbox."}
+          </h2>
+          {showGoogle && rating && (
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-[color:var(--chocolate)] underline-link"
+            >
+              {rating.toFixed(1)} ★ average · {totalReviews} Google reviews
+            </a>
+          )}
         </Reveal>
-        <Reveal delay={100} className="mt-10">
-          <GoogleReviewsWidget />
-        </Reveal>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {items.map((r, i) => (
+            <Reveal key={r.who + i} delay={i * 100}>
+              <figure className="card-warm flex h-full flex-col p-7">
+                <Quote className="h-7 w-7 text-[color:var(--gold)]" />
+                <blockquote className="mt-4 font-display text-xl leading-snug">
+                  "{r.text}"
+                </blockquote>
+                <figcaption className="mt-6 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  {r.who}
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
