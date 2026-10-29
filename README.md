@@ -25,15 +25,6 @@ A premium bakery website built for Grain Crumbs, showcasing handcrafted cookies,
 
 https://graincrumbs.com
 
-## Installation
-
-```bash
-git clone <repository-url>
-cd grain-crumbs
-npm install
-npm run dev
-```
-
 ## Build
 
 ```bash
